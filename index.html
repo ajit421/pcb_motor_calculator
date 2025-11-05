@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCB Motor Calculator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>PCB Motor Calculator</h1>
+            <p>Calculate motor parameters for PCB-based designs</p>
+        </header>
+
+        <div class="calculator-grid">
+
+            <div class="section input-section">
+                <div class="section-header">
+                    <h2>Input Parameters</h2>
+                </div>
+
+                <div class="input-grid">
+                    <div class="input-column">
+                        <div class="grid-container">
+                            <div class="grid-row header-row">
+                                <div class="grid-cell">Parameter</div>
+                                <div class="grid-cell">Value</div>
+                                <div class="grid-cell">Unit</div>
+                            </div>
+                            <div class="grid-row category-row">
+                                <div class="grid-cell" colspan="3">PCB Dimensions</div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">PCB Stator Outer Diameter</div>
+                                <div class="grid-cell"><input type="number" id="pcbStatorOD" value="100"></div>
+                                <div class="grid-cell">mm</div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">PCB Stator Inner Diameter</div>
+                                <div class="grid-cell"><input type="number" id="pcbStatorID" value="50"></div>
+                                <div class="grid-cell">mm</div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">PCB Board Thickness</div>
+                                <div class="grid-cell"><input type="number" id="pcbBoardThickness" value="1.6"></div>
+                                <div class="grid-cell">mm</div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">Trace Width at ID</div>
+                                <div class="grid-cell"><input type="number" id="traceWidthID" value="0.2"></div>
+                                <div class="grid-cell">mm</div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">Trace Gap</div>
+                                <div class="grid-cell"><input type="number" id="traceGap" value="0.2"></div>
+                                <div class="grid-cell">mm</div>
+                            </div>
+                            <div class="grid-row category-row">
+                                <div class="grid-cell" colspan="3">Electrical Parameters</div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">Current</div>
+                                <div class="grid-cell"><input type="number" id="current" value="10"></div>
+                                <div class="grid-cell">A</div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">Number of Cells</div>
+                                <div class="grid-cell"><input type="number" id="numCells" value="6"></div>
+                                <div class="grid-cell"></div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">Cell Charge Unit</div>
+                                <div class="grid-cell"><input type="number" id="cellChargeUnit" value="3.7"></div>
+                                <div class="grid-cell">V</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-column">
+                        <div class="grid-container">
+                            <div class="grid-row header-row">
+                                <div class="grid-cell">Parameter</div>
+                                <div class="grid-cell">Value</div>
+                                <div class="grid-cell">Unit</div>
+                            </div>
+                            <div class="grid-row category-row">
+                                <div class="grid-cell" colspan="3">Rotor and Magnetic Properties</div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">Permanent Magnet Rotor Height</div>
+                                <div class="grid-cell"><input type="number" id="pmRotorHeight" value="5"></div>
+                                <div class="grid-cell">mm</div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">Air Gap</div>
+                                <div class="grid-cell"><input type="number" id="airGap" value="0.5"></div>
+                                <div class="grid-cell">mm</div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">Remanence</div>
+                                <div class="grid-cell"><input type="number" id="remanence" value="1.2"></div>
+                                <div class="grid-cell">T</div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">Motor Parallel Constant</div>
+                                <div class="grid-cell"><input type="number" id="motorParallelConstant" value="1"></div>
+                                <div class="grid-cell"></div>
+                            </div>
+                            <div class="grid-row category-row">
+                                <div class="grid-cell" colspan="3">PCB Layers</div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">PCB Layer Copper Weight</div>
+                                <div class="grid-cell"><input type="number" id="pcbLayerOz" value="1"></div>
+                                <div class="grid-cell">oz/ft²</div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">Number of PCB Layers</div>
+                                <div class="grid-cell"><input type="number" id="numPCBLayers" value="6"></div>
+                                <div class="grid-cell"></div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">Number of PCB Layers in Series</div>
+                                <div class="grid-cell"><input type="number" id="numPCBLayersseries" value="3"></div>
+                                <div class="grid-cell"></div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">Number of PCB Layers in Parallel</div>
+                                <div class="grid-cell"><input type="number" id="numPCBLayersParallel" value="2"></div>
+                                <div class="grid-cell"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div> </div>
+
+
+            <div class="section trace-width-calculator">
+                <div class="section-header">
+                    <h2>Trace Width Calculator (IPC-2221)</h2>
+                </div>
+
+                <div class="input-grid">
+                    <div class="input-column">
+                        <div class="grid-container tw-input-container">
+                            <div class="grid-row header-row">
+                                <div class="grid-cell">Parameter</div>
+                                <div class="grid-cell">Value</div>
+                                <div class="grid-cell">Unit</div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">Current</div>
+                                <div class="grid-cell"><input type="number" id="tw_current" value="1"></div>
+                                <div class="grid-cell">A</div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">Temperature Rise</div>
+                                <div class="grid-cell"><input type="number" id="tw_rise" value="10"></div>
+                                <div class="grid-cell">
+                                    <select id="tw_riseUnit">
+                                        <option value="°C" selected>°C</option>
+                                        <option value="°F">°F</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">Ambient Temperature</div>
+                                <div class="grid-cell"><input type="number" id="tw_ambient" value="25"></div>
+                                <div class="grid-cell">
+                                    <select id="tw_ambientUnit">
+                                        <option value="°C" selected>°C</option>
+                                        <option value="°F">°F</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">Copper Thickness</div>
+                                <div class="grid-cell"><input type="number" id="tw_thickness" value="1"></div>
+                                <div class="grid-cell">
+                                    <select id="tw_thicknessUnit">
+                                        <option value="oz/ft²" selected>oz/ft²</option>
+                                        <option value="mil">mil</option>
+                                        <option value="mm">mm</option>
+                                        <option value="µm">µm</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid-row">
+                                <div class="grid-cell">Trace Length</div>
+                                <div class="grid-cell"><input type="number" id="tw_trace" value="10"></div>
+                                <div class="grid-cell">
+                                    <select id="tw_traceUnit">
+                                        <option value="cm" selected>cm</option>
+                                        <option value="in">in</option>
+                                        <option value="ft">ft</option>
+                                        <option value="mil">mil</option>
+                                        <option value="mm">mm</option>
+                                        <option value="µm">µm</option>
+                                        <option value="m">m</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-column">
+                        <div class="result-group tw-result-card">
+                            <div class="result-group-title">Internal Layer Results</div>
+                            <div class="result-row">
+                                <div class="result-label">Required Width</div>
+                                <div class="result-value" id="tw_internalWidth">N/A</div>
+                            </div>
+                            <div class="result-row">
+                                <div class="result-label">Resistance</div>
+                                <div class="result-value" id="tw_internalResistance">N/A</div>
+                            </div>
+                            <div class="result-row">
+                                <div class="result-label">Voltage Drop</div>
+                                <div class="result-value" id="tw_internalVoltage">N/A</div>
+                            </div>
+                            <div class="result-row">
+                                <div class="result-label">Power Loss</div>
+                                <div class="result-value" id="tw_internalPower">N/A</div>
+                            </div>
+                        </div>
+
+                        <div class="result-group tw-result-card">
+                            <div class="result-group-title">External Layer Results</div>
+                            <div class="result-row">
+                                <div class="result-label">Required Width</div>
+                                <div class="result-value" id="tw_externalWidth">N/A</div>
+                            </div>
+                            <div class="result-row">
+                                <div class="result-label">Resistance</div>
+                                <div class="result-value" id="tw_externalResistance">N/A</div>
+                            </div>
+                            <div class="result-row">
+                                <div class="result-label">Voltage Drop</div>
+                                <div class="result-value" id="tw_externalVoltage">N/A</div>
+                            </div>
+                            <div class="result-row">
+                                <div class="result-label">Power Loss</div>
+                                <div class="result-value" id="tw_externalPower">N/A</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="section results-section">
+                <div class="section-header">
+                    <h2>Calculation Results</h2>
+                    <div>
+                        <button id="calculateBtn" class="calculate-btn">Calculate</button>
+                        <button id="sendRequestBtn" class="send-btn">Send Request</button>
+                        <button id="downloadReportBtn" class="download-btn">Download Report</button>
+                    </div>
+                </div>
+                <div id="resultsContainer" class="results-container">
+                    <div class="placeholder-message">
+                        Enter parameters and click "Calculate" to see results
+                    </div>
+                </div>
+            </div>
+
+        </div> </div> <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2>Send Calculation Report</h2>
+            <p>Enter your details to save and send this report.</p>
+
+            <form id="reportForm">
+                <label for="userName">Name:</label>
+                <input type="text" id="userName" name="name" required>
+
+                <label for="userMobile">Mobile:</label>
+                <input type="tel" id="userMobile" name="mobile">
+
+                <label for="userEmail">Email:</label>
+                <input type="email" id="userEmail" name="email" required>
+
+                <button type="submit" id="sendReportSubmit" class="calculate-btn">Send</button>
+                <div id="formStatus"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/jspdf-autotable@latest/dist/jspdf.plugin.autotable.js"></script>
+
+    <script src="main.js"></script>
+    <script src="send_report.js"></script>
+    <script src="trace_width.js"></script>
+
+    <script src="synchronization.js"></script>
+
+    <script src="PDF_Generation.js"></script>
+
+</body>
+
+</html>
