@@ -1,24 +1,231 @@
-// main.js
-document.addEventListener("DOMContentLoaded", function () {
-  // Get the calculate button
-  const calculateBtn = document.getElementById("calculateBtn");
+// A global flag to prevent recursive loops (from synchronization.js)
+var isSyncing = false;
 
-  // Add event listener to the calculate button
-  calculateBtn.addEventListener("click", calculateMotorParameters);
+// --- TRACE WIDTH CALCULATOR (from trace_width.js) ---
 
-  // Also recalculate when any input changes
-  const inputs = document.querySelectorAll("input");
-  inputs.forEach((input) => {
-    input.addEventListener("input", calculateMotorParameters);
-  });
+// Conversion functions
+function milToMm(mil) {
+    return mil * 0.0254;
+}
 
-  // Initial calculation
-  setTimeout(calculateMotorParameters, 100);
-});
+function milToUm(mil) {
+    return mil * 25.4;
+}
+
+// Core calculation functions
+function external(current, rise) {
+    const k = 0.048;
+    const b = 0.44;
+    const c = 0.725;
+    return Math.pow(current / (k * Math.pow(rise, b)), 1 / c);
+}
+
+function internal(current, rise) {
+    const k = 0.024;
+    const b = 0.44;
+    const c = 0.725;
+    return Math.pow(current / (k * Math.pow(rise, b)), 1 / c);
+}
+
+function calcTraceWidth(current, thickness, rise, ambient, trace, thicknessUnit, riseUnit, ambientUnit, traceUnit) {
+    try {
+        // Convert Thickness to cm
+        let thicknessCm = thickness;
+        if (thicknessUnit === "oz/ft²") {
+            thicknessCm *= 0.0035; // oz to mm, then to cm
+        } else if (thicknessUnit === "mil") {
+            thicknessCm *= 2.54e-3; // mil to cm
+        } else if (thicknessUnit === "mm") {
+            thicknessCm *= 0.1; // mm to cm
+        } else if (thicknessUnit === "µm") {
+            thicknessCm *= 1e-4; // µm to cm
+        }
+
+        // Convert Temperature Rise to °C
+        let riseC = rise;
+        if (riseUnit === "°F") {
+            riseC = (rise * 5) / 9;
+        }
+
+        // Convert Ambient Temperature to °C
+        let ambientC = ambient;
+        if (ambientUnit === "°F") {
+            ambientC = (ambient - 32) * 5 / 9;
+        }
+
+        // Convert Trace Length to cm
+        let traceCm = trace;
+        if (traceUnit === "in") {
+            traceCm = trace / 0.393701;
+        } else if (traceUnit === "ft") {
+            traceCm = trace / 0.032808;
+        } else if (traceUnit === "mil") {
+            traceCm = trace / 393.7008;
+        } else if (traceUnit === "mm") {
+            traceCm = trace / 10;
+        } else if (traceUnit === "µm") {
+            traceCm = trace / 10000;
+        } else if (traceUnit === "m") {
+            traceCm = trace / 0.01;
+        }
+
+        // Internal Layer Calculation
+        const Ai = internal(current, riseC);
+        const AiM2 = Ai * 2.54 * 2.54 / 1e6; // Convert mil² to m²
+        const internalWidth = AiM2 / thicknessCm; // in m
+
+        const internalWidthMil = internalWidth / 2.54e-3;
+        const internalWidthMm = milToMm(internalWidthMil);
+        const internalWidthUm = milToUm(internalWidthMil);
+
+        // Resistance Calculation
+        const internalResistance = ((1.7e-6) * traceCm / AiM2) * (1 + 3.9e-3 * ((ambientC + riseC) - 25));
+        const internalVoltage = internalResistance * current;
+        const internalPower = current * current * internalResistance;
+
+        // External Layer Calculation
+        const Ae = external(current, riseC);
+        const AeM2 = Ae * 2.54 * 2.54 / 1e6; // Convert mil² to m²
+        const externalWidth = AeM2 / thicknessCm; // in m
+
+        const externalWidthMil = externalWidth / 2.54e-3;
+        const externalWidthMm = milToMm(externalWidthMil);
+        const externalWidthUm = milToUm(externalWidthMil);
+
+        const externalResistance = ((1.7e-6) * traceCm / AeM2) * (1 + 3.9e-3 * ((ambientC + riseC) - 25));
+        const externalVoltage = externalResistance * current;
+        const externalPower = current * current * externalResistance;
+
+        return {
+            internalWidth: internalWidth,
+            internalWidthMil: internalWidthMil,
+            internalWidthMm: internalWidthMm,
+            internalWidthUm: internalWidthUm,
+            externalWidth: externalWidth,
+            externalWidthMil: externalWidthMil,
+            externalWidthMm: externalWidthMm,
+            externalWidthUm: externalWidthUm,
+            internalResistance: internalResistance,
+            externalResistance: externalResistance,
+            internalVoltage: internalVoltage,
+            externalVoltage: externalVoltage,
+            internalPower: internalPower,
+            externalPower: externalPower
+        };
+    } catch (error) {
+        console.error('Calculation error:', error);
+        return null;
+    }
+}
+
+function formatNumber(num, precision = 11) {
+    if (num === null || num === undefined || isNaN(num)) return 'Error';
+    if (num === 0) return '0';
+
+    // For very small numbers, use scientific notation
+    if (Math.abs(num) < 1e-6) {
+        return num.toExponential(3);
+    }
+
+    // For normal numbers, use fixed precision
+    let s = num.toFixed(precision);
+    if (s.indexOf('.') !== -1) {
+         s = s.replace(/0+$/, '').replace(/\.$/, '');
+    }
+    return s;
+}
+
+function updateResults() {
+  // if (isSyncing) return; // ⬅️ Bug fix code from earlier
+    
+    // Use "tw_" prefixed IDs
+    const current = parseFloat(document.getElementById('tw_current').value) || 0;
+    const ambient = parseFloat(document.getElementById('tw_ambient').value) || 0;
+    const thickness = parseFloat(document.getElementById('tw_thickness').value) || 0;
+    const trace = parseFloat(document.getElementById('tw_trace').value) || 0;
+    const rise = parseFloat(document.getElementById('tw_rise').value) || 0;
+
+    const ambientUnit = document.getElementById('tw_ambientUnit').value;
+    const thicknessUnit = document.getElementById('tw_thicknessUnit').value;
+    const traceUnit = document.getElementById('tw_traceUnit').value;
+    const riseUnit = document.getElementById('tw_riseUnit').value;
+
+    if (current <= 0 || thickness <= 0 || trace <= 0 || rise <= 0) {
+        // Show error state
+        document.getElementById('tw_internalWidth').textContent = 'Please enter valid values';
+        document.getElementById('tw_externalWidth').textContent = 'Please enter valid values';
+        return;
+    }
+
+    const result = calcTraceWidth(current, thickness, rise, ambient, trace, thicknessUnit, riseUnit, ambientUnit, traceUnit);
+
+    if (!result) {
+        document.getElementById('tw_internalWidth').textContent = 'Calculation Error';
+        document.getElementById('tw_externalWidth').textContent = 'Calculation Error';
+        return;
+    }
+
+    // Update internal layer results
+    document.getElementById('tw_internalWidth').innerHTML = `
+        Width: ${formatNumber(result.internalWidthMil)} mil<br>
+        ${formatNumber(result.internalWidthMm)} mm | ${formatNumber(result.internalWidthUm)} µm
+    `;
+    // ==========================================================
+    // ⬇️ YEH RAHA FIX ⬇️
+    // ==========================================================
+    document.getElementById('tw_internalResistance').textContent = formatNumber(result.internalResistance) + ' Ohm';
+    // ==========================================================
+    // ⬆️ END OF FIX ⬆️
+    // ==========================================================
+    
+    document.getElementById('tw_internalVoltage').textContent = formatNumber(result.internalVoltage) + ' V';
+    document.getElementById('tw_internalPower').textContent = formatNumber(result.internalPower) + ' W';
+
+    // Update external layer results
+    document.getElementById('tw_externalWidth').innerHTML = `
+        Width: ${formatNumber(result.externalWidthMil)} mil<br>
+        ${formatNumber(result.externalWidthMm)} mm | ${formatNumber(result.externalWidthUm)} µm
+    `;
+    // ==========================================================
+    // ⬇️ YEH RAHA FIX ⬇️
+    // ==========================================================
+    document.getElementById('tw_externalResistance').textContent = formatNumber(result.externalResistance) + ' Ohm';
+    // ==========================================================
+    // ⬆️ END OF FIX ⬆️
+    // ==========================================================
+    
+    document.getElementById('tw_externalVoltage').textContent = formatNumber(result.externalVoltage) + ' V';
+    document.getElementById('tw_externalPower').textContent = formatNumber(result.externalPower) + ' W';
+
+    // Add pulse animation to results
+    document.querySelectorAll('.tw-result-card').forEach(card => {
+        card.classList.add('pulse');
+        setTimeout(() => card.classList.remove('pulse'), 1000);
+    });
+    
+    // --- NEW SYNC (Power Loss -> Motor Calculator) ---
+    if (result && result.internalPower !== null && isFinite(result.internalPower)) {
+        window.syncedCopperLossFromTrace = result.internalPower;
+    } else {
+        window.syncedCopperLossFromTrace = null; 
+    }
+
+    // Now, trigger the motor calculator to update its "Losses" section
+    if (!isSyncing) { // ⬅️ Bug fix code from earlier
+        if (typeof calculateMotorParameters === 'function') {
+            isSyncing = true; // Set flag *before* calling
+            calculateMotorParameters();
+            isSyncing = false; // Release flag *after*
+        }
+    }
+}
+
+
+// --- PCB MOTOR CALCULATOR (from main.js) ---
 
 // PCB Motor Calculator
 function calculateMotorParameters() {
-  if (window.isSyncing) return;
+  // if (isSyncing) return; // ⬅️ Bug fix code from earlier
   try {
     // Get input values
     const inputs = getMotorInputs();
@@ -35,14 +242,44 @@ function calculateMotorParameters() {
     // Store results globally
     window.motorResults = results;
 
-    if (typeof syncMotorToTrace === "function") {
-      syncMotorToTrace(results);
+    // --- OLD SYNC (Trace Length) ---
+    if (!isSyncing) { // ⬅️ Bug fix code from earlier
+        if (results.twoPhase && typeof updateResults === "function") {
+          isSyncing = true; // Set flag to prevent loop
+          document.getElementById("tw_trace").value = results.twoPhase.toFixed(4);
+          document.getElementById("tw_traceUnit").value = "m";
+          // Manually run the *other* calculator
+          updateResults();
+          isSyncing = false; // Release flag
+        }
+    }
+    
+    // --- NEW SYNC (Calculated Required Copper Thickness) ---
+    if (!isSyncing) { // ⬅️ Bug fix code from earlier
+        if (results.reqCopperThickness !== null && typeof updateResults === "function") {
+            isSyncing = true; // Set flag
+            
+            const twThicknessInput = document.getElementById('tw_thickness');
+            const twThicknessUnitInput = document.getElementById('tw_thicknessUnit');
+            
+            if (twThicknessInput && twThicknessUnitInput) {
+                // Set the value from the motor calculation
+                twThicknessInput.value = results.reqCopperThickness.toFixed(4);
+                // Set the unit to oz/ft², since that's what the motor calc uses
+                twThicknessUnitInput.value = 'oz/ft²'; 
+                
+                // Manually run the trace width calculator to update its results
+                updateResults();
+            }
+            
+            isSyncing = false; // Release flag
+        }
     }
 
-    // // instant synchronization
-    // if (typeof perfectSync === "function") {
-    //   perfectSync();
-    // }
+    // instant synchronization
+    if (typeof perfectSync === "function") {
+      perfectSync();
+    }
   } catch (error) {
     console.error("Motor calculation error:", error);
     displayMotorError("Calculation error: " + error.message);
@@ -487,30 +724,19 @@ function performMotorCalculations(inputs) {
       changed = true;
     }
 
-    // ⚠️ CRITICAL FIX: Copper Loss Calculation
-    let copperLossW = 0;
-    try {
-      // ALWAYS USE TRACE POWER LOSS - THIS IS THE KEY FIX
-      if (
+    // ⚠️ NEW: Copper Loss Calculation (Synced from Trace Width Calculator)
+    let copperLossW = 0; // Default to 0
+    if (
         window.syncedCopperLossFromTrace !== undefined &&
         window.syncedCopperLossFromTrace !== null &&
-        isFinite(window.syncedCopperLossFromTrace) &&
-        window.syncedCopperLossFromTrace > 0
-      ) {
+        isFinite(window.syncedCopperLossFromTrace)
+    ) {
+        // Take the value directly from the trace width calculator
         copperLossW = window.syncedCopperLossFromTrace;
-      } else {
-        throw new Error("Using fallback calculation");
-      }
-    } catch (error) {
-      // Fallback calculation with validation
-      const windingResistance = calculateWindingResistance(
-        results,
-        inputs.current,
-        inputs.pcbLayerOz,
-        inputs.numPCBLayersParallel
-      );
-      copperLossW = inputs.current * inputs.current * windingResistance;
-      console.warn("Using motor calculated copper loss:", copperLossW);
+    } else {
+        // If the trace calculator hasn't run or gave an invalid value, set to 0.
+        // As requested, we are no longer calculating it here.
+        copperLossW = 0; 
     }
 
     results.copperLoss = copperLossW;
@@ -568,220 +794,227 @@ function performMotorCalculations(inputs) {
 // Replace the old displayMotorResults function with this one
 
 function displayMotorResults(results) {
-    const resultsContainer = document.getElementById("resultsContainer");
-    if (!resultsContainer) return;
+  const resultsContainer = document.getElementById("resultsContainer");
+  if (!resultsContainer) return;
 
-    // 1. Clear the container and add the new grid structure
-    resultsContainer.innerHTML = `
+  // 1. Clear the container and add the new grid structure
+  resultsContainer.innerHTML = `
         <div class="results-grid">
             <div class="results-column" id="results-col-left"></div>
             <div class="results-column" id="results-col-right"></div>
         </div>
     `;
 
-    // 2. Get references to the new columns
-    const colLeft = document.getElementById("results-col-left");
-    const colRight = document.getElementById("results-col-right");
+  // 2. Get references to the new columns
+  const colLeft = document.getElementById("results-col-left");
+  const colRight = document.getElementById("results-col-right");
 
-    const resultGroups = [
+  const resultGroups = [
+    {
+      title: "PCB Dimensions",
+      items: [
+        { name: "Number of PCB", value: results.numPCB, unit: "" },
+        { name: "Stackup Height", value: results.stackupHeight, unit: "mm" },
         {
-            title: "PCB Dimensions",
-            items: [
-                { name: "Number of PCB", value: results.numPCB, unit: "" },
-                { name: "Stackup Height", value: results.stackupHeight, unit: "mm" },
-                {
-                    name: "Stator ID Circumference",
-                    value: results.statorIDCircumference,
-                    unit: "mm",
-                },
-                {
-                    name: "Trace Circumference at ID",
-                    value: results.traceCircumferenceID,
-                    unit: "mm",
-                },
-                { name: "Trace Radius ID", value: results.traceRadiusID, unit: "mm" },
-                { name: "Radial Gap ID", value: results.radialGapID, unit: "mm" },
-                { name: "Radial Gap OD", value: results.radialGapOD, unit: "mm" },
-                { name: "Trace Radius OD", value: results.traceRadiusOD, unit: "mm" },
-                {
-                    name: "Trace Circumference at OD",
-                    value: results.traceCircumferenceOD,
-                    unit: "mm",
-                },
-                { name: "Trace Width OD", value: results.traceWidthOD, unit: "mm" },
-                {
-                    name: "Average Trace Width",
-                    value: results.avgTraceWidth,
-                    unit: "mm",
-                },
-            ],
+          name: "Stator ID Circumference",
+          value: results.statorIDCircumference,
+          unit: "mm",
         },
         {
-            title: "Stator and Rotor Configuration",
-            items: [
-                {
-                    name: "Number of Stator Coil",
-                    value: results.numStatorCoil,
-                    unit: "",
-                },
-                { name: "Magnet Poles", value: results.magnetPoles, unit: "" },
-                { name: "Number of Phase", value: results.numPhase, unit: "" },
-                { name: "Per Phase Coil", value: results.perPhaseCoil, unit: "" },
-                {
-                    name: "Coil per Phase 180 Apart",
-                    value: results.coilPerPhase180,
-                    unit: "",
-                },
-                { name: "Number of Lines", value: results.numLines, unit: "" },
-                {
-                    name: "Number of Lines per Phase",
-                    value: results.numLinesPerPhase,
-                    unit: "",
-                },
-                {
-                    name: "Number of Lines per Phase 180 Apart",
-                    value: results.numLinesPerPhase180,
-                    unit: "",
-                },
-                {
-                    name: "Trace Length Radial Line",
-                    value: results.traceLengthRadial,
-                    unit: "mm",
-                },
-                { name: "Curved Line Width", value: results.curvedLineWidth, unit: "mm", },
-                {
-                    name: "Current Conducting Radial Length",
-                    value: results.currentConductingRadial,
-                    unit: "mm",
-                },
-            ],
+          name: "Trace Circumference at ID",
+          value: results.traceCircumferenceID,
+          unit: "mm",
+        },
+        { name: "Trace Radius ID", value: results.traceRadiusID, unit: "mm" },
+        { name: "Radial Gap ID", value: results.radialGapID, unit: "mm" },
+        { name: "Radial Gap OD", value: results.radialGapOD, unit: "mm" },
+        { name: "Trace Radius OD", value: results.traceRadiusOD, unit: "mm" },
+        {
+          name: "Trace Circumference at OD",
+          value: results.traceCircumferenceOD,
+          unit: "mm",
+        },
+        { name: "Trace Width OD", value: results.traceWidthOD, unit: "mm" },
+        {
+          name: "Average Trace Width",
+          value: results.avgTraceWidth,
+          unit: "mm",
+        },
+      ],
+    },
+    {
+      title: "Stator and Rotor Configuration",
+      items: [
+        {
+          name: "Number of Stator Coil",
+          value: results.numStatorCoil,
+          unit: "",
+        },
+        { name: "Magnet Poles", value: results.magnetPoles, unit: "" },
+        { name: "Number of Phase", value: results.numPhase, unit: "" },
+        { name: "Per Phase Coil", value: results.perPhaseCoil, unit: "" },
+        {
+          name: "Coil per Phase 180 Apart",
+          value: results.coilPerPhase180,
+          unit: "",
+        },
+        { name: "Number of Lines", value: results.numLines, unit: "" },
+        {
+          name: "Number of Lines per Phase",
+          value: results.numLinesPerPhase,
+          unit: "",
         },
         {
-            title: "Electrical Parameters",
-            items: [
-                {
-                    name: "Total Conductor Length all 3 phases",
-                    value: results.conductorLengthAll3Phase,
-                    unit: "m",
-                },
-                {
-                    name: "On Conductor Length (2 phases)",
-                    value: results.conductorLength2Phase,
-                    unit: "m",
-                },
-                {
-                    name: "2 Phase Switch On with series layers",
-                    value: results.twoPhase,
-                    unit: "m",
-                },
-                {
-                    name: "All 3 Phase with series layers",
-                    value: results.all3Phase,
-                    unit: "m",
-                },
-                {
-                    name: "Required Copper Thickness",
-                    value: results.reqCopperThickness,
-                    unit: "oz/ft²",
-                },
-                { name: "Non Magnet Area", value: results.nonMagnetArea, unit: "mm" },
-                { name: "Radius OD", value: results.radiusOD, unit: "mm" },
-                {
-                    name: "Average Torque Radius",
-                    value: results.avgTorqueRadius,
-                    unit: "mm",
-                },
-                {
-                    name: "Surface Magnetic Value",
-                    value: results.surfaceMagneticValue,
-                    unit: "T",
-                },
-                { name: "Height (H)", value: results.height, unit: "mm" },
-                { name: "Width (W) OD", value: results.widthOD, unit: "mm" },
-                { name: "Width (w) ID", value: results.widthID, unit: "mm" },
-                {
-                    name: "Length (L) from ID to OD",
-                    value: results.lengthIDtoOD,
-                    unit: "mm",
-                },
-                {
-                    name: "Parallel Stacking Constant",
-                    value: results.motorParallelConstant,
-                    unit: "",
-                },
-                { name: "Force", value: results.force, unit: "N" },
-                { name: "Voltage", value: results.voltage, unit: "V" },
-                { name: "Power In", value: results.powerIn, unit: "kW" },
-                { name: "Torque", value: results.torque, unit: "Nm" },
-                { name: "RPM", value: results.rpm, unit: "" },
-                { name: "Power Out", value: results.powerOut, unit: "kW" },
-                { name: "kV", value: results.kv, unit: "RPM/V" },
-                {
-                    name: "Actual Efficiency",
-                    value: results.actualEfficiency,
-                    unit: "%",
-                },
-            ],
+          name: "Number of Lines per Phase 180 Apart",
+          value: results.numLinesPerPhase180,
+          unit: "",
         },
         {
-            title: "Losses and Efficiency",
-            items: [
-                { name: "Copper Loss (P = I²R)", value: results.copperLoss, unit: "W" },
-                { name: "Core Loss", value: results.coreLoss, unit: "W" },
-                { name: "Mechanical Loss", value: results.mechanicalLoss, unit: "W" },
-                { name: "Stray Loss", value: results.strayLoss, unit: "W" },
-                { name: "Total Loss", value: results.totalLoss, unit: "W" },
-            ],
+          name: "Trace Length Radial Line",
+          value: results.traceLengthRadial,
+          unit: "mm",
         },
-    ];
+        {
+          name: "Curved Line Width",
+          value: results.curvedLineWidth,
+          unit: "mm",
+        },
+        {
+          name: "Current Conducting Radial Length",
+          value: results.currentConductingRadial,
+          unit: "mm",
+        },
+      ],
+    },
+    {
+      title: "Electrical Parameters",
+      items: [
+        {
+          name: "Total Conductor Length all 3 phases",
+          value: results.conductorLengthAll3Phase,
+          unit: "m",
+        },
+        {
+          name: "On Conductor Length (2 phases)",
+          value: results.conductorLength2Phase,
+          unit: "m",
+        },
+        {
+          name: "2 Phase Switch On with series layers",
+          value: results.twoPhase,
+          unit: "m",
+        },
+        {
+          name: "All 3 Phase with series layers",
+          value: results.all3Phase,
+          unit: "m",
+        },
+        {
+          name: "Required Copper Thickness",
+          value: results.reqCopperThickness,
+          unit: "oz/ft²",
+        },
+        { name: "Non Magnet Area", value: results.nonMagnetArea, unit: "mm" },
+        { name: "Radius OD", value: results.radiusOD, unit: "mm" },
+        {
+          name: "Average Torque Radius",
+          value: results.avgTorqueRadius,
+          unit: "mm",
+        },
+        {
+          name: "Surface Magnetic Value",
+          value: results.surfaceMagneticValue,
+          unit: "T",
+        },
+        { name: "Height (H)", value: results.height, unit: "mm" },
+        { name: "Width (W) OD", value: results.widthOD, unit: "mm" },
+        { name: "Width (w) ID", value: results.widthID, unit: "mm" },
+        {
+          name: "Length (L) from ID to OD",
+          value: results.lengthIDtoOD,
+          unit: "mm",
+        },
+        {
+          name: "Parallel Stacking Constant",
+          value: results.motorParallelConstant,
+          unit: "",
+        },
+        { name: "Force", value: results.force, unit: "N" },
+        { name: "Voltage", value: results.voltage, unit: "V" },
+        { name: "Power In", value: results.powerIn, unit: "kW" },
+        { name: "Torque", value: results.torque, unit: "Nm" },
+        { name: "RPM", value: results.rpm, unit: "" },
+        { name: "Power Out", value: results.powerOut, unit: "kW" },
+        { name: "kV", value: results.kv, unit: "RPM/V" },
+        {
+          name: "Actual Efficiency",
+          value: results.actualEfficiency,
+          unit: "%",
+        },
+      ],
+    },
+    {
+      title: "Losses and Efficiency",
+      items: [
+        { name: "Copper Loss (P = I²R)", value: results.copperLoss, unit: "W" },
+        { name: "Core Loss", value: results.coreLoss, unit: "W" },
+        { name: "Mechanical Loss", value: results.mechanicalLoss, unit: "W" },
+        { name: "Stray Loss", value: results.strayLoss, unit: "W" },
+        { name: "Total Loss", value: results.totalLoss, unit: "W" },
+      ],
+    },
+  ];
 
-    // 3. Loop through groups and build them
-    resultGroups.forEach((group) => {
-        const groupDiv = document.createElement("div");
-        groupDiv.className = "result-group";
-        
-        // Note: I removed margin-bottom from .result-group style
-        // We now use 'gap' in .results-column
-        groupDiv.style.marginBottom = "0"; 
+  // 3. Loop through groups and build them
+  resultGroups.forEach((group) => {
+    const groupDiv = document.createElement("div");
+    groupDiv.className = "result-group";
 
-        const title = document.createElement("div");
-        title.className = "result-group-title";
-        title.textContent = group.title;
-        groupDiv.appendChild(title);
+    // Note: I removed margin-bottom from .result-group style
+    // We now use 'gap' in .results-column
+    groupDiv.style.marginBottom = "0";
 
-        group.items.forEach((item) => {
-            const row = document.createElement("div");
-            row.className = "result-row";
+    const title = document.createElement("div");
+    title.className = "result-group-title";
+    title.textContent = group.title;
+    groupDiv.appendChild(title);
 
-            const label = document.createElement("div");
-            label.className = "result-label";
-            label.textContent = item.name;
+    group.items.forEach((item) => {
+      const row = document.createElement("div");
+      row.className = "result-row";
 
-            const value = document.createElement("div");
-            value.className = "result-value";
+      const label = document.createElement("div");
+      label.className = "result-label";
+      label.textContent = item.name;
 
-            if (item.value !== null && !isNaN(item.value) && isFinite(item.value)) {
-                if (item.unit === "%" || item.unit === "kW") {
-                    value.textContent = `${item.value.toFixed(4)} ${item.unit}`;
-                } else {
-                    value.textContent = `${item.value.toFixed(4)} ${item.unit}`;
-                }
-            } else {
-                value.textContent = "N/A";
-            }
+      const value = document.createElement("div");
+      value.className = "result-value";
 
-            row.appendChild(label);
-            row.appendChild(value);
-            groupDiv.appendChild(row);
-        });
-
-        // 4. Append the group to the correct column
-        if (group.title === "PCB Dimensions" || group.title === "Stator and Rotor Configuration") {
-            colLeft.appendChild(groupDiv);
+      if (item.value !== null && !isNaN(item.value) && isFinite(item.value)) {
+        if (item.unit === "%" || item.unit === "kW") {
+          value.textContent = `${item.value.toFixed(4)} ${item.unit}`;
         } else {
-            colRight.appendChild(groupDiv);
+          value.textContent = `${item.value.toFixed(4)} ${item.unit}`;
         }
+      } else {
+        value.textContent = "N/A";
+      }
+
+      row.appendChild(label);
+      row.appendChild(value);
+      groupDiv.appendChild(row);
     });
+
+    // 4. Append the group to the correct column
+    if (
+      group.title === "PCB Dimensions" ||
+      group.title === "Stator and Rotor Configuration"
+    ) {
+      colLeft.appendChild(groupDiv);
+    } else {
+      colRight.appendChild(groupDiv);
+    }
+  });
 }
 
 function displayMotorError(message) {
@@ -793,7 +1026,65 @@ function displayMotorError(message) {
 
 // Dummy function for perfectSync
 function perfectSync() {
-  // This function is called but not defined in the original code
-  // Adding a dummy implementation to prevent errors
   console.log("Perfect sync function called");
 }
+
+// --- INITIALIZATION (Combined from all 3 files) ---
+document.addEventListener("DOMContentLoaded", function () {
+    
+    // --- Logic from main.js ---
+    const calculateBtn = document.getElementById("calculateBtn");
+    if (calculateBtn) { // Safety check
+        calculateBtn.addEventListener("click", calculateMotorParameters);
+    }
+    const motorInputs = document.querySelectorAll(".input-section input");
+    motorInputs.forEach((input) => {
+        input.addEventListener("input", calculateMotorParameters);
+    });
+    // Initial calculation for motor
+    setTimeout(calculateMotorParameters, 100); // from main.js
+
+    // --- Logic from trace_width.js ---
+    const twInputs = document.querySelectorAll('.trace-width-calculator input, .trace-width-calculator select');
+    twInputs.forEach(input => {
+        input.addEventListener('input', updateResults);
+        input.addEventListener('change', updateResults);
+    });
+    // Initial calculation for trace width
+    setTimeout(updateResults, 100); // from trace_width.js
+
+    // --- Logic from synchronization.js ---
+    const motorCurrent = document.getElementById('current');
+    const twCurrent = document.getElementById('tw_current');
+    
+    // const motorCopper = document.getElementById('pcbLayerOz');
+    // const twCopper = document.getElementById('tw_thickness');
+    // const twCopperUnit = document.getElementById('tw_thicknessUnit');
+
+    // Sync 1: Current (Motor <-> TW)
+    if (motorCurrent && twCurrent) {
+        // Motor Current -> TW Current
+        motorCurrent.addEventListener('input', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            twCurrent.value = motorCurrent.value;
+            if (typeof updateResults === 'function') {
+                updateResults();
+            }
+            isSyncing = false;
+        });
+
+        // TW Current -> Motor Current
+        twCurrent.addEventListener('input', () => {
+            if (isSyncing) return;
+            isSyncing = true;
+            motorCurrent.value = twCurrent.value;
+            if (typeof calculateMotorParameters === 'function') {
+                calculateMotorParameters();
+            }
+            isSyncing = false;
+        });
+    }
+
+    // Sync 2: Copper Thickness (REMOVED as per new logic)
+});
