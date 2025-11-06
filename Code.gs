@@ -1,7 +1,12 @@
 // This is your updated Google Apps Script code (Code.gs)
-// It now logs ALL parameters from both calculators.
+// It now logs ALL parameters AND sends email notifications.
 
 function doPost(e) {
+  
+  // --- ⬇️ SET YOUR ADMIN EMAIL HERE ⬇️ ---
+  const NOTIFICATION_EMAIL = "ajit.info999@gmail.com"; 
+  // --- ⬆️ SET YOUR ADMIN EMAIL HERE ⬆️ ---
+
   try {
     // Find the sheet named "Sheet1", or just use the first sheet
     let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
@@ -24,11 +29,10 @@ function doPost(e) {
         'PM Rotor Height (mm)', 'Air Gap (mm)', 'Remanence (T)',
         'Current (A)', 'Num Cells', 'Cell Charge Unit (V)', 'Motor Parallel Constant',
         
-        // --- ⬇️ NEW TRACE CALCULATOR HEADERS ⬇️ ---
+        // Trace Calculator Headers
         'TW Current', 'TW Temp Rise', 'TW Ambient Temp', 'TW Copper Thickness', 'TW Trace Length',
         'TW Internal Width', 'TW Internal Resistance', 'TW Internal Voltage', 'TW Internal Power',
         'TW External Width', 'TW External Resistance', 'TW External Voltage', 'TW External Power',
-        // --- ⬆️ END NEW HEADERS ⬆️ ---
 
         // Motor Result Headers
         'Number of PCB', 'Stackup Height (mm)', 'Stator ID Circumference (mm)',
@@ -83,7 +87,7 @@ function doPost(e) {
       data.inputs.cellChargeUnit,
       data.inputs.motorParallelConstant,
 
-      // --- ⬇️ NEW TRACE CALCULATOR DATA ⬇️ ---
+      // Trace Calculator Data
       data.traceInputs.current,
       data.traceInputs.rise,
       data.traceInputs.ambient,
@@ -97,7 +101,6 @@ function doPost(e) {
       data.traceResults.externalResistance,
       data.traceResults.externalVoltage,
       data.traceResults.externalPower,
-      // --- ⬆️ END NEW DATA ⬆️ ---
       
       // Motor Result values
       data.results.numPCB,
@@ -155,6 +158,33 @@ function doPost(e) {
     ];
 
     sheet.appendRow(newRow);
+    
+    // --- ⬇️ NEW: Send Email Notifications ⬇️ ---
+    
+    // 1. Send notification to admin
+    try {
+      if (NOTIFICATION_EMAIL && NOTIFICATION_EMAIL !== "ajit.info999@gmail.com") {
+        const adminSubject = "New PCB Calculator Submission Received";
+        const adminBody = `A new submission was received from: ${data.name || 'N/A'} (${data.email || 'N/A'}).\n\nData has been saved to the spreadsheet.`;
+        GmailApp.sendEmail(NOTIFICATION_EMAIL, adminSubject, adminBody);
+      }
+    } catch (emailError) {
+      Logger.log(`Failed to send admin notification: ${emailError.toString()}`);
+    }
+
+    // 2. Send confirmation to the user
+    try {
+      if (data.email) { // Only send if an email was provided
+        const userSubject = "Your PCB Calculator Submission";
+        const userBody = `Hi ${data.name || 'there'},\n\nThank you for your submission. We have received your calculator data.\n\nBest regards,\nYour Team`;
+        GmailApp.sendEmail(data.email, userSubject, userBody);
+      }
+    } catch (emailError) {
+      Logger.log(`Failed to send user confirmation email to ${data.email}: ${emailError.toString()}`);
+    }
+    
+    // --- ⬆️ End Email Notifications ⬆️ ---
+
     
     return ContentService
       .createTextOutput(JSON.stringify({success: true, message: 'Data saved successfully'}))

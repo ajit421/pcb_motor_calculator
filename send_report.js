@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ❗ IMPORTANT: REPLACE THIS URL
     // Get this from Google Apps Script after you Deploy
     // -------------------------------------------------------------------------
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxDiS5ITkGzLMXmjCJUZItLn2kz0mOvzpYsHRDCaFc9UPvGxaN3wqox3bRn2gGyO7yIsw/exec';
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwWOf8SZo3eyjHjYUVUTv9WP8d7KovDiStwRreVem3LoPeOUaKvZIxPSMY9xlxaLoLv3g/exec';
     
     // Get all the modal elements
     const modal = document.getElementById('reportModal');
