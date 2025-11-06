@@ -320,11 +320,26 @@ header p {
     font-size: 0.95rem;
 }
 
+
+
+
+
+
+
+
+
+
+
 #reportForm button {
     margin-top: 20px;
     width: 100%;
     font-size: 1rem;
+    padding: 20px 0;
+    margin: 20px 0;
+
 }
+
+
 
 #formStatus {
     margin-top: 15px;
