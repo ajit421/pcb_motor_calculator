@@ -1,11 +1,65 @@
-// send_report.js
+// ===================================================================
+// HELPER FUNCTIONS (Copied from PDF_Generation.js)
+// We need these here so this script can find the trace calculator values.
+// ===================================================================
+
+/**
+ * Gets all input values from the Trace Width calculator.
+ */
+function getTraceInputs() {
+    try {
+        return {
+            current: document.getElementById('tw_current').value + ' A',
+            rise: document.getElementById('tw_rise').value + ' ' + document.getElementById('tw_riseUnit').value,
+            ambient: document.getElementById('tw_ambient').value + ' ' + document.getElementById('tw_ambientUnit').value,
+            thickness: document.getElementById('tw_thickness').value + ' ' + document.getElementById('tw_thicknessUnit').value,
+            trace: document.getElementById('tw_trace').value + ' ' + document.getElementById('tw_traceUnit').value,
+        };
+    } catch (e) {
+        console.error("Error getting trace inputs:", e);
+        return { error: "Could not read trace inputs" };
+    }
+}
+
+/**
+ * Gets all result values from the Trace Width calculator.
+ */
+function getTraceResults() {
+    const getElemText = (id) => {
+        const elem = document.getElementById(id);
+        // .innerText se multiline text (jaise width) mil jaata hai
+        return elem ? elem.innerText.replace(/\n/g, ' ') : 'Error: N/A'; // Replace newlines with a space
+    };
+    
+    try {
+        return {
+            internalWidth: getElemText('tw_internalWidth'),
+            internalResistance: getElemText('tw_internalResistance'),
+            internalVoltage: getElemText('tw_internalVoltage'),
+            internalPower: getElemText('tw_internalPower'),
+            externalWidth: getElemText('tw_externalWidth'),
+            externalResistance: getElemText('tw_externalResistance'),
+            externalVoltage: getElemText('tw_externalVoltage'),
+            externalPower: getElemText('tw_externalPower'),
+        };
+    } catch (e) {
+        console.error("Error getting trace results:", e);
+        return { error: "Could not read trace results" };
+    }
+}
+
+
+// ===================================================================
+// MAIN SCRIPT LOGIC
+// ===================================================================
+
 document.addEventListener('DOMContentLoaded', function() {
     
     // -------------------------------------------------------------------------
     // ❗ IMPORTANT: REPLACE THIS URL
     // Get this from Google Apps Script after you Deploy
     // -------------------------------------------------------------------------
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyLlR2Z0uwNV8c0p0wnXXo2ggCeMZ29S98X1Yt0WQymU4H5h7jTRAfBy0378s55XQnuJA/exec';
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxDiS5ITkGzLMXmjCJUZItLn2kz0mOvzpYsHRDCaFc9UPvGxaN3wqox3bRn2gGyO7yIsw/exec';
     
     // Get all the modal elements
     const modal = document.getElementById('reportModal');
@@ -49,11 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
             modal.style.display = 'none';
         }
     });
-
-    // 
-    // ===================================================================
-    // THIS IS THE CORRECTED FUNCTION - REPLACE YOUR OLD ONE WITH THIS
-    // ===================================================================
+    
     reportForm.addEventListener('submit', (event) => {
         event.preventDefault(); // Stop the form from submitting normally
         
@@ -74,7 +124,11 @@ document.addEventListener('DOMContentLoaded', function() {
             email: userEmail,
             userAgent: navigator.userAgent,
             inputs: getMotorInputs(),      // This function is in main.js
-            results: window.motorResults    // This variable is set in main.js
+            results: window.motorResults,  // This variable is set in main.js
+            
+            // --- ⬇️ THIS IS THE NEW PART ⬇️ ---
+            traceInputs: getTraceInputs(),   // From helper function
+            traceResults: getTraceResults()  // From helper function
         };
 
         // 4. Send the data to the Google Script

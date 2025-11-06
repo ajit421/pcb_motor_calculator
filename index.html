@@ -35,22 +35,26 @@
                             </div>
                             <div class="grid-row">
                                 <div class="grid-cell">PCB Stator Outer Diameter</div>
-                                <div class="grid-cell"><input type="number" id="pcbStatorOD" step="0.1" value="109.5"></div>
+                                <div class="grid-cell"><input type="number" id="pcbStatorOD" step="0.1" value="109.5">
+                                </div>
                                 <div class="grid-cell">mm</div>
                             </div>
                             <div class="grid-row">
                                 <div class="grid-cell">PCB Stator Inner Diameter</div>
-                                <div class="grid-cell"><input type="number" id="pcbStatorID" step="0.1" value="65"></div>
+                                <div class="grid-cell"><input type="number" id="pcbStatorID" step="0.1" value="65">
+                                </div>
                                 <div class="grid-cell">mm</div>
                             </div>
                             <div class="grid-row">
                                 <div class="grid-cell">PCB Board Thickness</div>
-                                <div class="grid-cell"><input type="number" id="pcbBoardThickness" step="0.1" value="1.6"></div>
+                                <div class="grid-cell"><input type="number" id="pcbBoardThickness" step="0.1"
+                                        value="1.6"></div>
                                 <div class="grid-cell">mm</div>
                             </div>
                             <div class="grid-row">
                                 <div class="grid-cell">Trace Width at ID</div>
-                                <div class="grid-cell"><input type="number" id="traceWidthID" step="0.1" value="1.77"></div>
+                                <div class="grid-cell"><input type="number" id="traceWidthID" step="0.1" value="1.77">
+                                </div>
                                 <div class="grid-cell">mm</div>
                             </div>
                             <div class="grid-row">
@@ -73,7 +77,8 @@
                             </div>
                             <div class="grid-row">
                                 <div class="grid-cell">Cell Charge Unit</div>
-                                <div class="grid-cell"><input type="number" id="cellChargeUnit" step="0.1" value="4.2"></div>
+                                <div class="grid-cell"><input type="number" id="cellChargeUnit" step="0.1" value="4.2">
+                                </div>
                                 <div class="grid-cell">V</div>
                             </div>
                         </div>
@@ -90,7 +95,8 @@
                             </div>
                             <div class="grid-row">
                                 <div class="grid-cell">Permanent Magnet Rotor Axial Height</div>
-                                <div class="grid-cell"><input type="number" id="pmRotorHeight" step="0.1" value="6"></div>
+                                <div class="grid-cell"><input type="number" id="pmRotorHeight" step="0.1" value="6">
+                                </div>
                                 <div class="grid-cell">mm</div>
                             </div>
                             <div class="grid-row">
@@ -105,7 +111,8 @@
                             </div>
                             <div class="grid-row">
                                 <div class="grid-cell">Motor Parallel stacking Constant</div>
-                                <div class="grid-cell"><input type="number" id="motorParallelConstant" step="0.1" value="1.5"></div>
+                                <div class="grid-cell"><input type="number" id="motorParallelConstant" step="0.1"
+                                        value="1.5"></div>
                                 <div class="grid-cell"></div>
                             </div>
                             <div class="grid-row category-row">
@@ -123,17 +130,20 @@
                             </div>
                             <div class="grid-row">
                                 <div class="grid-cell">Number of PCB Layers in Series connection</div>
-                                <div class="grid-cell"><input type="number" id="numPCBLayersseries" step="1" value="36"></div>
+                                <div class="grid-cell"><input type="number" id="numPCBLayersseries" step="1" value="36">
+                                </div>
                                 <div class="grid-cell"></div>
                             </div>
                             <div class="grid-row">
                                 <div class="grid-cell">Number of PCB Layers in Parallel</div>
-                                <div class="grid-cell"><input type="number" id="numPCBLayersParallel" step="1" value="1"></div>
+                                <div class="grid-cell"><input type="number" id="numPCBLayersParallel" step="1"
+                                        value="1"></div>
                                 <div class="grid-cell"></div>
                             </div>
                         </div>
                     </div>
-                </div> </div>
+                </div>
+            </div>
 
 
             <div class="section trace-width-calculator">
@@ -176,7 +186,8 @@
                             </div>
                             <div class="grid-row">
                                 <div class="grid-cell">Copper Thickness</div>
-                                <div class="grid-cell"><input type="number" id="tw_thickness" step="0.1" value="6"></div>
+                                <div class="grid-cell"><input type="number" id="tw_thickness" step="0.1" value="6">
+                                </div>
                                 <div class="grid-cell">
                                     <select id="tw_thicknessUnit">
                                         <option value="oz/ft²" selected>oz/ft²</option>
@@ -265,7 +276,9 @@
                 </div>
             </div>
 
-        </div> </div> <div id="reportModal" class="modal">
+        </div>
+    </div>
+    <div id="reportModal" class="modal">
         <div class="modal-content">
             <span class="modal-close">&times;</span>
             <h2>Send Calculation Report</h2>
@@ -290,12 +303,14 @@
     <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
     <script src="https://unpkg.com/jspdf-autotable@latest/dist/jspdf.plugin.autotable.js"></script>
 
-    <script src="synchronization.js"></script>
+    <!-- <script src="synchronization.js"></script> -->
     <script src="main.js"></script>
-    <script src="send_report.js"></script>
-
     <script src="trace_width.js"></script>
     <script src="PDF_Generation.js"></script>
+    <script src="send_report.js"></script>
+
+
+
 
 </body>
 

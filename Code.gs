@@ -1,4 +1,5 @@
-// This is your Google Apps Script code (Code.gs)
+// This is your updated Google Apps Script code (Code.gs)
+// It now logs ALL parameters from both calculators.
 
 function doPost(e) {
   try {
@@ -9,37 +10,62 @@ function doPost(e) {
     }
     
     const data = JSON.parse(e.postData.contents);
-    
+
     // Prepare headers if this is the first entry
     if (sheet.getLastRow() === 0) {
       const headers = [
+        // User Info
         'Timestamp', 'Name', 'Mobile', 'Email', 'User Agent',
         
-        // Input headers
+        // Motor Input Headers
         'PCB Stator OD (mm)', 'PCB Stator ID (mm)', 'PCB Board Thickness (mm)', 
         'Trace Width ID (mm)', 'Trace Gap (mm)', 'PCB Layer Oz (oz/ft²)',
         'Num PCB Layers', 'Num PCB Layers Series', 'Num PCB Layers Parallel',
         'PM Rotor Height (mm)', 'Air Gap (mm)', 'Remanence (T)',
         'Current (A)', 'Num Cells', 'Cell Charge Unit (V)', 'Motor Parallel Constant',
         
-        // Key result headers
-        'Number of PCB', 'Stackup Height (mm)', 'Voltage (V)', 'Power In (kW)', 
-        'Torque (Nm)', 'RPM', 'Power Out (kW)', 'Actual Efficiency (%)',
-        'Total Loss (W)', 'Copper Loss (W)'
+        // --- ⬇️ NEW TRACE CALCULATOR HEADERS ⬇️ ---
+        'TW Current', 'TW Temp Rise', 'TW Ambient Temp', 'TW Copper Thickness', 'TW Trace Length',
+        'TW Internal Width', 'TW Internal Resistance', 'TW Internal Voltage', 'TW Internal Power',
+        'TW External Width', 'TW External Resistance', 'TW External Voltage', 'TW External Power',
+        // --- ⬆️ END NEW HEADERS ⬆️ ---
+
+        // Motor Result Headers
+        'Number of PCB', 'Stackup Height (mm)', 'Stator ID Circumference (mm)',
+        'Trace Circumference at ID (mm)', 'Trace Radius ID (mm)', 'Radial Gap ID (mm)',
+        'Radial Gap OD (mm)', 'Trace Radius OD (mm)', 'Trace Circumference at OD (mm)',
+        'Trace Width OD (mm)', 'Average Trace Width (mm)',
+        
+        'Number of Stator Coil', 'Magnet Poles', 'Number of Phase',
+        'Per Phase Coil', 'Coil per Phase 180 Apart', 'Number of Lines',
+        'Number of Lines per Phase', 'Number of Lines per Phase 180 Apart',
+        'Trace Length Radial Line (mm)', 'Curved Line Width (mm)',
+        'Current Conducting Radial Length (mm)',
+        
+        'Total Conductor Length all 3 phases (m)', 'On Conductor Length (2 phases) (m)',
+        '2 Phase Switch On with series layers (m)', 'All 3 Phase with series layers (m)',
+        'Required Copper Thickness (oz/ft²)', 'Non Magnet Area (mm)', 'Radius OD (mm)',
+        'Average Torque Radius (mm)', 'Surface Magnetic Value (T)', 'Height (H) (mm)',
+        'Width (W) OD (mm)', 'Width (w) ID (mm)', 'Length (L) from ID to OD (mm)',
+        'Force (N)', 'Voltage (V)', 'Power In (kW)', 'Torque (Nm)', 'RPM',
+        'Power Out (kW)', 'kV (RPM/V)',
+        
+        'Actual Efficiency (%)', 'Copper Loss (W)', 'Core Loss (W)',
+        'Mechanical Loss (W)', 'Stray Loss (W)', 'Total Loss (W)'
       ];
       sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
     }
     
-    // Add new row
-    // We add the user info at the start
+    // --- ALL DATA FOR THE NEW ROW ---
     const newRow = [
+      // User Info
       data.timestamp,
       data.name,
       data.mobile,
       data.email,
       data.userAgent,
       
-      // Input values
+      // Motor Input values
       data.inputs.pcbStatorOD,
       data.inputs.pcbStatorID,
       data.inputs.pcbBoardThickness,
@@ -56,26 +82,84 @@ function doPost(e) {
       data.inputs.numCells,
       data.inputs.cellChargeUnit,
       data.inputs.motorParallelConstant,
+
+      // --- ⬇️ NEW TRACE CALCULATOR DATA ⬇️ ---
+      data.traceInputs.current,
+      data.traceInputs.rise,
+      data.traceInputs.ambient,
+      data.traceInputs.thickness,
+      data.traceInputs.trace,
+      data.traceResults.internalWidth,
+      data.traceResults.internalResistance,
+      data.traceResults.internalVoltage,
+      data.traceResults.internalPower,
+      data.traceResults.externalWidth,
+      data.traceResults.externalResistance,
+      data.traceResults.externalVoltage,
+      data.traceResults.externalPower,
+      // --- ⬆️ END NEW DATA ⬆️ ---
       
-      // Key result values
+      // Motor Result values
       data.results.numPCB,
       data.results.stackupHeight,
+      data.results.statorIDCircumference,
+      data.results.traceCircumferenceID,
+      data.results.traceRadiusID,
+      data.results.radialGapID,
+      data.results.radialGapOD,
+      data.results.traceRadiusOD,
+      data.results.traceCircumferenceOD,
+      data.results.traceWidthOD,
+      data.results.avgTraceWidth,
+      
+      data.results.numStatorCoil,
+      data.results.magnetPoles,
+      data.results.numPhase,
+      data.results.perPhaseCoil,
+      data.results.coilPerPhase180,
+      data.results.numLines,
+      data.results.numLinesPerPhase,
+      data.results.numLinesPerPhase180,
+      data.results.traceLengthRadial,
+      data.results.curvedLineWidth,
+      data.results.currentConductingRadial,
+      
+      data.results.conductorLengthAll3Phase,
+      data.results.conductorLength2Phase,
+      data.results.twoPhase,
+      data.results.all3Phase,
+      data.results.reqCopperThickness,
+      data.results.nonMagnetArea,
+      data.results.radiusOD,
+      data.results.avgTorqueRadius,
+      data.results.surfaceMagneticValue,
+      data.results.height,
+      data.results.widthOD,
+      data.results.widthID,
+      data.results.lengthIDtoOD,
+      
+      data.results.force,
       data.results.voltage,
       data.results.powerIn,
       data.results.torque,
       data.results.rpm,
       data.results.powerOut,
+      data.results.kv,
+
       data.results.actualEfficiency,
-      data.results.totalLoss,
-      data.results.copperLoss
+      data.results.copperLoss,
+      data.results.coreLoss,
+      data.results.mechanicalLoss,
+      data.results.strayLoss,
+      data.results.totalLoss
     ];
-    
+
     sheet.appendRow(newRow);
     
     return ContentService
       .createTextOutput(JSON.stringify({success: true, message: 'Data saved successfully'}))
       .setMimeType(ContentService.MimeType.JSON);
-      
+
   } catch (error) {
     Logger.log('Error: ' + error.toString());
     return ContentService
