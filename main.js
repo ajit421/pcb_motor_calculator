@@ -214,14 +214,13 @@ function updateResults() {
     if (!isSyncing) { // ⬅️ Bug fix code from earlier
         if (typeof calculateMotorParameters === 'function') {
             isSyncing = true; // Set flag *before* calling
-            calculateMotorParameters();
+            calculateMotorParameters(true);
             isSyncing = false; // Release flag *after*
         }
     }
 }
 
 
-// --- PCB MOTOR CALCULATOR (from main.js) ---
 
 // PCB Motor Calculator
 function calculateMotorParameters() {
