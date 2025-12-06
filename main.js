@@ -1072,34 +1072,6 @@ function displayMotorResults(results) {
     },
 
     {
-      title: "Cost",
-      items: [
-        {
-          name: "Total PCB Cost",
-          value: results.numPCB * 500,
-          unit: "₹",
-          decimals: 0,
-        },
-        {
-          name: "Magnet Cost",
-          value: (results.numPCB + 1) * results.height * 100,
-          unit: "₹",
-          decimals: 0,
-        },
-        { name: "Miscellaneous Cost", value: 100, unit: "₹", decimals: 0 },
-        {
-          name: "Total Cost",
-          value:
-            results.numPCB * 500 +
-            (results.numPCB + 1) * results.height * 100 +
-            100,
-          unit: "₹",
-          decimals: 0,
-        },
-      ],
-    },
-
-    {
       title: "Electrical Parameters",
       items: [
         {
@@ -1218,6 +1190,33 @@ function displayMotorResults(results) {
           value: results.totalLoss,
           unit: "W",
           decimals: 6,
+        },
+      ],
+    },
+    {
+      title: "Cost",
+      items: [
+        {
+          name: "Total PCB Cost",
+          value: results.numPCB * 500,
+          unit: "₹",
+          decimals: 0,
+        },
+        {
+          name: "Magnet Cost",
+          value: (results.numPCB + 1) * results.height * 100,
+          unit: "₹",
+          decimals: 0,
+        },
+        { name: "Miscellaneous Cost", value: 100, unit: "₹", decimals: 0 },
+        {
+          name: "Total Cost",
+          value:
+            results.numPCB * 500 +
+            (results.numPCB + 1) * results.height * 100 +
+            100,
+          unit: "₹",
+          decimals: 0,
         },
       ],
     },
@@ -1346,3 +1345,55 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Sync 2: Copper Thickness (REMOVED as per new logic)
 });
+
+// --- HELPER FUNCTIONS FOR REPORTS (Move this to main.js) ---
+
+/**
+ * Gets all input values from the Trace Width calculator.
+ */
+function getTraceInputs() {
+  try {
+    const getVal = (id) => {
+      const el = document.getElementById(id);
+      return el ? el.value : "";
+    };
+    // Trace width inputs fetch kar rahe hain
+    return {
+      current: getVal("tw_current") + " A",
+      rise: getVal("tw_rise") + " " + getVal("tw_riseUnit"),
+      ambient: getVal("tw_ambient") + " " + getVal("tw_ambientUnit"),
+      thickness: getVal("tw_thickness") + " " + getVal("tw_thicknessUnit"),
+      trace: getVal("tw_trace") + " " + getVal("tw_traceUnit"),
+    };
+  } catch (e) {
+    console.error("Error getting trace inputs:", e);
+    return { error: "Could not read trace inputs" };
+  }
+}
+
+/**
+ * Gets all result values from the Trace Width calculator.
+ */
+function getTraceResults() {
+  const getElemText = (id) => {
+    const elem = document.getElementById(id);
+    // New lines ko space se replace kar rahe hain taaki PDF/Excel mein sahi dikhe
+    return elem ? elem.innerText.replace(/\n/g, " ") : "Error: N/A";
+  };
+
+  try {
+    return {
+      internalWidth: getElemText("tw_internalWidth"),
+      internalResistance: getElemText("tw_internalResistance"),
+      internalVoltage: getElemText("tw_internalVoltage"),
+      internalPower: getElemText("tw_internalPower"),
+      externalWidth: getElemText("tw_externalWidth"),
+      externalResistance: getElemText("tw_externalResistance"),
+      externalVoltage: getElemText("tw_externalVoltage"),
+      externalPower: getElemText("tw_externalPower"),
+    };
+  } catch (e) {
+    console.error("Error getting trace results:", e);
+    return { error: "Could not read trace results" };
+  }
+}

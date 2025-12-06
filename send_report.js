@@ -6,47 +6,51 @@
 /**
  * Gets all input values from the Trace Width calculator.
  */
-function getTraceInputs() {
-    try {
-        return {
-            current: document.getElementById('tw_current').value + ' A',
-            rise: document.getElementById('tw_rise').value + ' ' + document.getElementById('tw_riseUnit').value,
-            ambient: document.getElementById('tw_ambient').value + ' ' + document.getElementById('tw_ambientUnit').value,
-            thickness: document.getElementById('tw_thickness').value + ' ' + document.getElementById('tw_thicknessUnit').value,
-            trace: document.getElementById('tw_trace').value + ' ' + document.getElementById('tw_traceUnit').value,
-        };
-    } catch (e) {
-        console.error("Error getting trace inputs:", e);
-        return { error: "Could not read trace inputs" };
-    }
-}
 
-/**
- * Gets all result values from the Trace Width calculator.
- */
-function getTraceResults() {
-    const getElemText = (id) => {
-        const elem = document.getElementById(id);
-        // .innerText se multiline text (jaise width) mil jaata hai
-        return elem ? elem.innerText.replace(/\n/g, ' ') : 'Error: N/A'; // Replace newlines with a space
-    };
+
+
+
+// function getTraceInputs() {
+//     try {
+//         return {
+//             current: document.getElementById('tw_current').value + ' A',
+//             rise: document.getElementById('tw_rise').value + ' ' + document.getElementById('tw_riseUnit').value,
+//             ambient: document.getElementById('tw_ambient').value + ' ' + document.getElementById('tw_ambientUnit').value,
+//             thickness: document.getElementById('tw_thickness').value + ' ' + document.getElementById('tw_thicknessUnit').value,
+//             trace: document.getElementById('tw_trace').value + ' ' + document.getElementById('tw_traceUnit').value,
+//         };
+//     } catch (e) {
+//         console.error("Error getting trace inputs:", e);
+//         return { error: "Could not read trace inputs" };
+//     }
+// }
+
+// /**
+//  * Gets all result values from the Trace Width calculator.
+//  */
+// function getTraceResults() {
+//     const getElemText = (id) => {
+//         const elem = document.getElementById(id);
+//         // .innerText se multiline text (jaise width) mil jaata hai
+//         return elem ? elem.innerText.replace(/\n/g, ' ') : 'Error: N/A'; // Replace newlines with a space
+//     };
     
-    try {
-        return {
-            internalWidth: getElemText('tw_internalWidth'),
-            internalResistance: getElemText('tw_internalResistance'),
-            internalVoltage: getElemText('tw_internalVoltage'),
-            internalPower: getElemText('tw_internalPower'),
-            externalWidth: getElemText('tw_externalWidth'),
-            externalResistance: getElemText('tw_externalResistance'),
-            externalVoltage: getElemText('tw_externalVoltage'),
-            externalPower: getElemText('tw_externalPower'),
-        };
-    } catch (e) {
-        console.error("Error getting trace results:", e);
-        return { error: "Could not read trace results" };
-    }
-}
+//     try {
+//         return {
+//             internalWidth: getElemText('tw_internalWidth'),
+//             internalResistance: getElemText('tw_internalResistance'),
+//             internalVoltage: getElemText('tw_internalVoltage'),
+//             internalPower: getElemText('tw_internalPower'),
+//             externalWidth: getElemText('tw_externalWidth'),
+//             externalResistance: getElemText('tw_externalResistance'),
+//             externalVoltage: getElemText('tw_externalVoltage'),
+//             externalPower: getElemText('tw_externalPower'),
+//         };
+//     } catch (e) {
+//         console.error("Error getting trace results:", e);
+//         return { error: "Could not read trace results" };
+//     }
+// }
 
 
 // ===================================================================
@@ -59,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ❗ IMPORTANT: REPLACE THIS URL
     // Get this from Google Apps Script after you Deploy
     // -------------------------------------------------------------------------
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwWOf8SZo3eyjHjYUVUTv9WP8d7KovDiStwRreVem3LoPeOUaKvZIxPSMY9xlxaLoLv3g/exec';
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxkijW3gMsDI3Ja8w6qKF2AyU5WLXChoabbk1rRJk89UCZ6KyixpdJ5JISFY8MxKcbowA/exec';
     
     // Get all the modal elements
     const modal = document.getElementById('reportModal');

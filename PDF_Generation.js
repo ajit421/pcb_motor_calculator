@@ -200,22 +200,6 @@ function addMotorSection(doc, yPos, inputs, results) {
   ];
   yPos = drawTable(doc, yPos, "Stator & Rotor Configuration", statorData);
 
-  // 3. Cost Section (Re-calculated here to ensure it appears in PDF)
-  // Logic based on your main.js
-  const costPCB = results.numPCB * 500;
-  const costMagnet = (results.numPCB + 1) * results.height * 100;
-  const costMisc = 100;
-  const costTotal = costPCB + costMagnet + costMisc;
-
-  const costData = [
-    ["Parameter", "Value", "Unit"],
-    ["Total PCB Cost", fmt(costPCB, 0), "INR"],
-    ["Magnet Cost", fmt(costMagnet, 0), "INR"],
-    ["Miscellaneous Cost", fmt(costMisc, 0), "INR"],
-    ["Total Cost", fmt(costTotal, 0), "INR"],
-  ];
-  yPos = drawTable(doc, yPos, "Estimated Cost", costData);
-
   // 4. Electrical
   const electricalData = [
     ["Parameter", "Value", "Unit"],
@@ -259,6 +243,21 @@ function addMotorSection(doc, yPos, inputs, results) {
   ];
   yPos = drawTable(doc, yPos, "Losses & Efficiency", lossData);
 
+  // 3. Cost Section (Re-calculated here to ensure it appears in PDF)
+  // Logic based on your main.js
+  const costPCB = results.numPCB * 500;
+  const costMagnet = (results.numPCB + 1) * results.height * 100;
+  const costMisc = 100;
+  const costTotal = costPCB + costMagnet + costMisc;
+
+  const costData = [
+    ["Parameter", "Value", "Unit"],
+    ["Total PCB Cost", fmt(costPCB, 0), "INR"],
+    ["Magnet Cost", fmt(costMagnet, 0), "INR"],
+    ["Miscellaneous Cost", fmt(costMisc, 0), "INR"],
+    ["Total Cost", fmt(costTotal, 0), "INR"],
+  ];
+  yPos = drawTable(doc, yPos, "Estimated Cost", costData);
   return yPos;
 }
 
@@ -403,36 +402,36 @@ function addFooter(doc) {
 
 // --- Utility Functions ---
 
-function getTraceInputs() {
-  const getVal = (id) => {
-    const el = document.getElementById(id);
-    return el ? el.value : "";
-  };
-  return {
-    current: getVal("tw_current") + " A",
-    rise: getVal("tw_rise") + " " + getVal("tw_riseUnit"),
-    ambient: getVal("tw_ambient") + " " + getVal("tw_ambientUnit"),
-    thickness: getVal("tw_thickness") + " " + getVal("tw_thicknessUnit"),
-    trace: getVal("tw_trace") + " " + getVal("tw_traceUnit"),
-  };
-}
+// function getTraceInputs() {
+//   const getVal = (id) => {
+//     const el = document.getElementById(id);
+//     return el ? el.value : "";
+//   };
+//   return {
+//     current: getVal("tw_current") + " A",
+//     rise: getVal("tw_rise") + " " + getVal("tw_riseUnit"),
+//     ambient: getVal("tw_ambient") + " " + getVal("tw_ambientUnit"),
+//     thickness: getVal("tw_thickness") + " " + getVal("tw_thicknessUnit"),
+//     trace: getVal("tw_trace") + " " + getVal("tw_traceUnit"),
+//   };
+// }
 
-function getTraceResults() {
-  const getElemText = (id) => {
-    const elem = document.getElementById(id);
-    return elem ? elem.innerText.replace(/\n/g, " ") : "Error: N/A";
-  };
-  return {
-    internalWidth: getElemText("tw_internalWidth"),
-    internalResistance: getElemText("tw_internalResistance"),
-    internalVoltage: getElemText("tw_internalVoltage"),
-    internalPower: getElemText("tw_internalPower"),
-    externalWidth: getElemText("tw_externalWidth"),
-    externalResistance: getElemText("tw_externalResistance"),
-    externalVoltage: getElemText("tw_externalVoltage"),
-    externalPower: getElemText("tw_externalPower"),
-  };
-}
+// function getTraceResults() {
+//   const getElemText = (id) => {
+//     const elem = document.getElementById(id);
+//     return elem ? elem.innerText.replace(/\n/g, " ") : "Error: N/A";
+//   };
+//   return {
+//     internalWidth: getElemText("tw_internalWidth"),
+//     internalResistance: getElemText("tw_internalResistance"),
+//     internalVoltage: getElemText("tw_internalVoltage"),
+//     internalPower: getElemText("tw_internalPower"),
+//     externalWidth: getElemText("tw_externalWidth"),
+//     externalResistance: getElemText("tw_externalResistance"),
+//     externalVoltage: getElemText("tw_externalVoltage"),
+//     externalPower: getElemText("tw_externalPower"),
+//   };
+// }
 
 /**
  * Improved formatting helper.
