@@ -53,7 +53,7 @@
                             </div>
                             <div class="grid-row">
                                 <div class="grid-cell">Trace Width at ID</div>
-                                <div class="grid-cell"><input type="number" id="traceWidthID" step="0.1" value="1.77">
+                                <div class="grid-cell"><input type="number" id="traceWidthID" step="0.01" value="1.77">
                                 </div>
                                 <div class="grid-cell">mm</div>
                             </div>
@@ -120,7 +120,7 @@
                             </div>
                             <div class="grid-row">
                                 <div class="grid-cell">PCB Layer Copper Weight</div>
-                                <div class="grid-cell"><input type="number" id="pcbLayerOz" step="0.1" value="6"></div>
+                                <div class="grid-cell"><input type="number" id="pcbLayerOz" step="1" value="6"></div>
                                 <div class="grid-cell">oz/ft²</div>
                             </div>
                             <div class="grid-row">
@@ -166,7 +166,8 @@
                             </div>
                             <div class="grid-row">
                                 <div class="grid-cell">Temperature Rise</div>
-                                <div class="grid-cell"><input type="number" id="tw_rise" step="0.1" value="25"></div>
+                                <div class="grid-cell"><input type="number" id="tw_rise" step="0.1" readonly
+                                        style="background-color: #e9ecef; color: #555;"></div>
                                 <div class="grid-cell">
                                     <select id="tw_riseUnit">
                                         <option value="°C" selected>°C</option>
@@ -186,7 +187,8 @@
                             </div>
                             <div class="grid-row">
                                 <div class="grid-cell">Copper Thickness</div>
-                                <div class="grid-cell"><input type="number" id="tw_thickness" step="0.1" value="6">
+                                <div class="grid-cell"><input type="number" id="tw_thickness" step="0.1"
+                                        readonly style="background-color: #e9ecef; color: #424040;">
                                 </div>
                                 <div class="grid-cell">
                                     <select id="tw_thicknessUnit">
@@ -199,7 +201,8 @@
                             </div>
                             <div class="grid-row">
                                 <div class="grid-cell">Trace Length</div>
-                                <div class="grid-cell"><input type="number" id="tw_trace" value="10"></div>
+                                <div class="grid-cell"><input type="number" id="tw_trace" readonly
+                                        style="background-color: #e9ecef; color: #424040;"></div>
                                 <div class="grid-cell">
                                     <select id="tw_traceUnit">
                                         <option value="cm" selected>cm</option>
@@ -305,7 +308,7 @@
 
     <!-- <script src="synchronization.js"></script> -->
     <script src="main.js"></script>
-    <script src="trace_width.js"></script>
+    <!-- <script src="trace_width.js"></script> -->
     <script src="PDF_Generation.js"></script>
     <script src="send_report.js"></script>
 
