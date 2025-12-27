@@ -562,9 +562,7 @@ function performMotorCalculations(inputs) {
     }
 
     if (results.numLines === null && results.statorIDCircumference !== null) {
-      results.numLines = Math.ceil(
-        results.statorIDCircumference / (inputs.traceWidthID + inputs.traceGap)
-      );
+      results.numLines = Math.ceil(results.statorIDCircumference / (inputs.traceWidthID + inputs.traceGap));
       results.numLines = Math.ceil(results.numLines / 6) * 6;
       changed = true;
     }
@@ -868,11 +866,7 @@ function performMotorCalculations(inputs) {
     results.coreLoss = copperLossW * 0.63;
     results.mechanicalLoss = copperLossW * 0.5;
     results.strayLoss = copperLossW * 0.25;
-    results.totalLoss =
-      results.copperLoss +
-      results.coreLoss +
-      results.mechanicalLoss +
-      results.strayLoss;
+    results.totalLoss = results.copperLoss + results.coreLoss + results.mechanicalLoss + results.strayLoss;
 
     // Efficiency Calculation
     const effResult = calculateActualEfficiency({
