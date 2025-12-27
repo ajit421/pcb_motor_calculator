@@ -1321,6 +1321,7 @@ document.addEventListener("DOMContentLoaded", function () {
       twCurrent.value = motorCurrent.value;
       if (typeof updateResults === "function") {
         updateResults();
+        calculateMotorParameters(true);
       }
       isSyncing = false;
     });
@@ -1332,6 +1333,7 @@ document.addEventListener("DOMContentLoaded", function () {
       motorCurrent.value = twCurrent.value;
       if (typeof calculateMotorParameters === "function") {
         calculateMotorParameters();
+        updateResults();
       }
       isSyncing = false;
     });
