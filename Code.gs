@@ -1,4 +1,4 @@
-// This is your updated Google Apps Script code (Code.gs)
+// updated Google Apps Script code (Code.gs)
 // It now logs ALL parameters AND sends email notifications.
 
 function doPost(e) {

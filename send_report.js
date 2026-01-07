@@ -1,59 +1,4 @@
 // ===================================================================
-// HELPER FUNCTIONS (Copied from PDF_Generation.js)
-// We need these here so this script can find the trace calculator values.
-// ===================================================================
-
-/**
- * Gets all input values from the Trace Width calculator.
- */
-
-
-
-
-// function getTraceInputs() {
-//     try {
-//         return {
-//             current: document.getElementById('tw_current').value + ' A',
-//             rise: document.getElementById('tw_rise').value + ' ' + document.getElementById('tw_riseUnit').value,
-//             ambient: document.getElementById('tw_ambient').value + ' ' + document.getElementById('tw_ambientUnit').value,
-//             thickness: document.getElementById('tw_thickness').value + ' ' + document.getElementById('tw_thicknessUnit').value,
-//             trace: document.getElementById('tw_trace').value + ' ' + document.getElementById('tw_traceUnit').value,
-//         };
-//     } catch (e) {
-//         console.error("Error getting trace inputs:", e);
-//         return { error: "Could not read trace inputs" };
-//     }
-// }
-
-// /**
-//  * Gets all result values from the Trace Width calculator.
-//  */
-// function getTraceResults() {
-//     const getElemText = (id) => {
-//         const elem = document.getElementById(id);
-//         // .innerText se multiline text (jaise width) mil jaata hai
-//         return elem ? elem.innerText.replace(/\n/g, ' ') : 'Error: N/A'; // Replace newlines with a space
-//     };
-    
-//     try {
-//         return {
-//             internalWidth: getElemText('tw_internalWidth'),
-//             internalResistance: getElemText('tw_internalResistance'),
-//             internalVoltage: getElemText('tw_internalVoltage'),
-//             internalPower: getElemText('tw_internalPower'),
-//             externalWidth: getElemText('tw_externalWidth'),
-//             externalResistance: getElemText('tw_externalResistance'),
-//             externalVoltage: getElemText('tw_externalVoltage'),
-//             externalPower: getElemText('tw_externalPower'),
-//         };
-//     } catch (e) {
-//         console.error("Error getting trace results:", e);
-//         return { error: "Could not read trace results" };
-//     }
-// }
-
-
-// ===================================================================
 // MAIN SCRIPT LOGIC
 // ===================================================================
 
@@ -138,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 4. Send the data to the Google Script
         fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST',
-            mode: 'no-cors', // <-- THIS IS THE CRITICAL FIX
+            mode: 'no-cors',
             cache: 'no-cache',
             headers: {
                 'Content-Type': 'application/json',

@@ -400,38 +400,6 @@ function addFooter(doc) {
   }
 }
 
-// --- Utility Functions ---
-
-// function getTraceInputs() {
-//   const getVal = (id) => {
-//     const el = document.getElementById(id);
-//     return el ? el.value : "";
-//   };
-//   return {
-//     current: getVal("tw_current") + " A",
-//     rise: getVal("tw_rise") + " " + getVal("tw_riseUnit"),
-//     ambient: getVal("tw_ambient") + " " + getVal("tw_ambientUnit"),
-//     thickness: getVal("tw_thickness") + " " + getVal("tw_thicknessUnit"),
-//     trace: getVal("tw_trace") + " " + getVal("tw_traceUnit"),
-//   };
-// }
-
-// function getTraceResults() {
-//   const getElemText = (id) => {
-//     const elem = document.getElementById(id);
-//     return elem ? elem.innerText.replace(/\n/g, " ") : "Error: N/A";
-//   };
-//   return {
-//     internalWidth: getElemText("tw_internalWidth"),
-//     internalResistance: getElemText("tw_internalResistance"),
-//     internalVoltage: getElemText("tw_internalVoltage"),
-//     internalPower: getElemText("tw_internalPower"),
-//     externalWidth: getElemText("tw_externalWidth"),
-//     externalResistance: getElemText("tw_externalResistance"),
-//     externalVoltage: getElemText("tw_externalVoltage"),
-//     externalPower: getElemText("tw_externalPower"),
-//   };
-// }
 
 /**
  * Improved formatting helper.
