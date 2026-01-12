@@ -422,6 +422,53 @@ header p {
 }
 
 
+/* --- DASHBOARD STYLES --- */
+.dashboard-grid {
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    background-color: #f9f9f9;
+}
+
+.chart-container {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+}
+
+.chart-container h3 {
+    text-align: center;
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+/* Full width for the Master Chart */
+.full-width {
+    width: 100%;
+    height: 400px; /* Taller for the main chart */
+}
+
+/* Half width for smaller charts */
+.half-width {
+    width: calc(50% - 10px);
+    height: 300px;
+}
+
+/* On mobile, make everything full width */
+@media (max-width: 768px) {
+    .half-width {
+        width: 100%;
+    }
+}
+
+
+
+
 /* Responsive adjustments */
 /* The @media query for 1024px is no longer needed since 1fr is now the default */
 @media (max-width: 768px) {

@@ -318,6 +318,11 @@ function calculateMotorParameters() {
     // Store results globally
     window.motorResults = results;
 
+    // --- NEW: UPDATE DASHBOARD ---
+    if (typeof updateDashboard === 'function') {
+      updateDashboard(inputs, results);
+    }
+
     // --- OLD SYNC (Trace Length) ---
     if (!isSyncing) {
       if (results.twoPhase && typeof updateResults === "function") {
