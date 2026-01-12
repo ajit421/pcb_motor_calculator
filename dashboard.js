@@ -419,9 +419,9 @@ function renderLossChart(results) {
 
 
 
-// --- TRACE DISTRIBUTION CHART (Professional Upgrade) ---
+
+// --- TRACE DISTRIBUTION CHART (Ultra-Professional Look) ---
 function renderTraceDistChart() {
-    // 1. Data Fetching (Same as before)
     const intW = parseFloat(document.getElementById('tw_internalWidth').innerText) || 0;
     const extW = parseFloat(document.getElementById('tw_externalWidth').innerText) || 0;
     
@@ -430,53 +430,53 @@ function renderTraceDistChart() {
 
     const ctx = document.getElementById('traceDistChart').getContext('2d');
     
-    // Destroy old chart if exists
     if (traceDistChartInstance) traceDistChartInstance.destroy();
 
-    // 2. Setup Gradients (Premium Look)
-    // Blue Gradient for Width
+    // --- 1. Create Premium Gradients ---
+    
+    // Gradient A: Width (Cool Cyan-Blue)
     let gradientWidth = ctx.createLinearGradient(0, 0, 0, 400);
-    gradientWidth.addColorStop(0, 'rgba(44, 62, 80, 0.9)');  // Dark Blue Top
-    gradientWidth.addColorStop(1, 'rgba(44, 62, 80, 0.6)');  // Lighter Blue Bottom
+    gradientWidth.addColorStop(0, '#4FACFE');  // Cyan Top
+    gradientWidth.addColorStop(1, '#00F2FE');  // Light Cyan Bottom
 
-    // Red/Orange Gradient for Power
+    // Gradient B: Power (Hot Red-Orange)
     let gradientPower = ctx.createLinearGradient(0, 0, 0, 400);
-    gradientPower.addColorStop(0, 'rgba(231, 76, 60, 0.9)'); // Red Top
-    gradientPower.addColorStop(1, 'rgba(231, 76, 60, 0.6)'); // Lighter Red Bottom
+    gradientPower.addColorStop(0, '#FF0844');  // Deep Red Top
+    gradientPower.addColorStop(1, '#FFB199');  // Soft Pink Bottom
 
-    // 3. Render Chart
     traceDistChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: ['Internal Layer', 'External Layer'],
             datasets: [
                 {
-                    label: 'Required Width (mil)',
+                    label: 'Required Width',
                     data: [intW, extW],
                     backgroundColor: gradientWidth,
-                    borderColor: '#2c3e50',
+                    borderColor: '#4FACFE',
                     borderWidth: 1,
-                    borderRadius: 6,       // Rounded Corners
-                    barPercentage: 0.6,    // Slimmer bars
+                    // Sirf upar se round karne ke liye:
+                    borderRadius: { topLeft: 10, topRight: 10 }, 
+                    barPercentage: 0.5,
                     categoryPercentage: 0.8,
-                    yAxisID: 'y'           // Links to Left Axis
+                    yAxisID: 'y'
                 },
                 {
-                    label: 'Power Loss (W)',
+                    label: 'Power Loss',
                     data: [intP, extP],
                     backgroundColor: gradientPower,
-                    borderColor: '#c0392b',
+                    borderColor: '#FF0844',
                     borderWidth: 1,
-                    borderRadius: 6,       // Rounded Corners
-                    barPercentage: 0.6,    // Slimmer bars
+                    borderRadius: { topLeft: 10, topRight: 10 },
+                    barPercentage: 0.5,
                     categoryPercentage: 0.8,
-                    yAxisID: 'y1'          // Links to Right Axis
+                    yAxisID: 'y1'
                 }
             ]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false, // Fills the container
+            maintainAspectRatio: false,
             interaction: {
                 mode: 'index',
                 intersect: false,
@@ -484,69 +484,62 @@ function renderTraceDistChart() {
             plugins: {
                 legend: {
                     position: 'top',
+                    align: 'end', // Legend ko right side shift kiya
                     labels: {
-                        usePointStyle: true, // Circle instead of box
-                        padding: 20,
-                        font: { size: 12, weight: 'bold' }
+                        usePointStyle: true,
+                        boxWidth: 8,
+                        font: { size: 12, weight: '600' },
+                        color: '#555'
                     }
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    titleColor: '#333',
-                    bodyColor: '#333',
-                    borderColor: '#ddd',
-                    borderWidth: 1,
-                    padding: 10,
+                    backgroundColor: 'rgba(30, 30, 30, 0.9)', // Dark tooltip
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    padding: 12,
+                    cornerRadius: 8,
+                    displayColors: true,
                     callbacks: {
                         label: function(context) {
                             let label = context.dataset.label || '';
                             let value = context.parsed.y;
-                            return " " + label + ": " + value.toFixed(2);
+                            // Tooltip me Unit dikhane ke liye
+                            let unit = label.includes('Width') ? ' mil' : ' W';
+                            return " " + label + ": " + value.toFixed(2) + unit;
                         }
                     }
                 }
             },
             scales: {
                 x: {
-                    grid: {
-                        display: false // Remove vertical grid lines (cleaner)
-                    },
+                    grid: { display: false },
                     ticks: {
-                        font: { weight: 'bold' },
-                        color: '#555'
+                        font: { size: 13, weight: 'bold' },
+                        color: '#444'
                     }
                 },
-                // LEFT AXIS (Width - Blue)
+                // Left Axis (Width)
                 y: {
                     type: 'linear',
                     display: true,
                     position: 'left',
-                    title: { 
-                        display: true, 
-                        text: 'Width (mil)',
-                        color: '#2c3e50',
-                        font: { weight: 'bold' }
-                    },
-                    ticks: { color: '#2c3e50' },
-                    grid: {
-                        color: '#f0f0f0', // Very light grey grid
-                        borderDash: [5, 5] // Dashed lines
+                    title: { display: true, text: 'Width (mil)', color: '#4FACFE', font: {weight:'bold'} },
+                    grid: { color: '#f3f3f3', borderDash: [5, 5] },
+                    ticks: { 
+                        color: '#4FACFE',
+                        callback: function(value) { return value + ' mil'; } // Axis par unit
                     }
                 },
-                // RIGHT AXIS (Power - Red)
+                // Right Axis (Power)
                 y1: {
                     type: 'linear',
                     display: true,
                     position: 'right',
-                    title: { 
-                        display: true, 
-                        text: 'Power Loss (W)',
-                        color: '#c0392b',
-                        font: { weight: 'bold' }
-                    },
-                    ticks: { color: '#c0392b' },
-                    grid: {
-                        drawOnChartArea: false // Hide grid for right axis (avoids clutter)
+                    title: { display: true, text: 'Power Loss (W)', color: '#FF0844', font: {weight:'bold'} },
+                    grid: { drawOnChartArea: false },
+                    ticks: { 
+                        color: '#FF0844',
+                        callback: function(value) { return value + ' W'; } // Axis par unit
                     }
                 }
             }
@@ -555,42 +548,101 @@ function renderTraceDistChart() {
 }
 
 
-
+// --- TORQUE VS RPM CHART (Premium Gradient Look) ---
 function renderTorqueRpmChart(data) {
     const ctx = document.getElementById('torqueRpmChart').getContext('2d');
+    
+    // Purana chart delete karein taaki glitch na ho
     if (torqueRpmChartInstance) torqueRpmChartInstance.destroy();
 
+    // --- 1. Create Electric Gradient ---
+    // Upar Dark Purple, Neeche Fade White
+    let gradientFill = ctx.createLinearGradient(0, 0, 0, 400);
+    gradientFill.addColorStop(0, 'rgba(142, 68, 173, 0.6)'); // Dark Purple (Top)
+    gradientFill.addColorStop(1, 'rgba(142, 68, 173, 0.0)'); // Transparent (Bottom)
+
+    // Data points set karna
     const points = data.rpm.map((r, i) => ({ x: r, y: data.torque[i] }));
 
     torqueRpmChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
             datasets: [{
-                label: 'Torque vs RPM',
+                label: 'Torque Curve',
                 data: points,
-                borderColor: '#8e44ad',
-                backgroundColor: 'rgba(142, 68, 173, 0.2)',
-                fill: true,
-                tension: 0.4,
-                pointRadius: 0,
-                hoverRadius: 5
+                borderColor: '#8e44ad',  // Solid Purple Line
+                borderWidth: 3,          // Line thodi moti (bold)
+                backgroundColor: gradientFill, // Gradient Fill
+                fill: true,              // Area fill on
+                tension: 0.4,            // Smooth Curves (Curvy Line)
+                pointRadius: 0,          // Points hide karein (clean look)
+                pointHoverRadius: 8,     // Hover karne par bada point dikhega
+                pointHoverBackgroundColor: '#fff', // White point on hover
+                pointHoverBorderColor: '#8e44ad',  // Purple border on hover
+                pointHoverBorderWidth: 3
             }]
         },
         options: {
             responsive: true,
-            scales: {
-                x: { 
-                    type: 'linear', 
-                    position: 'bottom',
-                    title: { display: true, text: 'RPM' } 
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            },
+            plugins: {
+                legend: {
+                    display: false // Title hata diya (Clean look ke liye)
                 },
-                y: { 
-                    title: { display: true, text: 'Torque (N.m)' } 
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // Dark Tooltip
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    padding: 10,
+                    displayColors: false,
+                    callbacks: {
+                        title: function(context) {
+                            return 'RPM: ' + context[0].parsed.x.toFixed(4);
+                        },
+                        label: function(context) {
+                            return 'Torque: ' + context.parsed.y.toFixed(4) + ' N.m';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    type: 'linear',
+                    position: 'bottom',
+                    grid: {
+                        display: false, // Vertical lines hata di (Cleaner)
+                        drawBorder: false
+                    },
+                    title: { 
+                        display: true, 
+                        text: 'Speed (RPM)', 
+                        color: '#555',
+                        font: { weight: 'bold' }
+                    }
+                },
+                y: {
+                    grid: {
+                        color: '#f0f0f0', // Light horizontal lines
+                        borderDash: [5, 5] // Dashed lines
+                    },
+                    title: { 
+                        display: true, 
+                        text: 'Torque (N.m)', 
+                        color: '#8e44ad',
+                        font: { weight: 'bold' }
+                    },
+                    beginAtZero: true
                 }
             }
         }
     });
 }
+
 
 function renderPowerChart(data) {
     const ctx = document.getElementById('powerChart').getContext('2d');
