@@ -244,10 +244,9 @@ function updateResults() {
 
   // Update internal layer results
   document.getElementById("tw_internalWidth").innerHTML = `
-        Width: ${formatNumber(result.internalWidthMil)} mil<br>
-        ${formatNumber(result.internalWidthMm)} mm | ${formatNumber(
-    result.internalWidthUm
-  )} µm
+        ${formatNumber(result.internalWidthMil)} mil<br>
+        ${formatNumber(result.internalWidthMm)} mm <br>
+        ${formatNumber(result.internalWidthUm)} µm
     `;
 
   document.getElementById("tw_internalResistance").textContent =
@@ -259,10 +258,9 @@ function updateResults() {
 
   // Update external layer results
   document.getElementById("tw_externalWidth").innerHTML = `
-        Width: ${formatNumber(result.externalWidthMil)} mil<br>
-        ${formatNumber(result.externalWidthMm)} mm | ${formatNumber(
-    result.externalWidthUm
-  )} µm
+        ${formatNumber(result.externalWidthMil)} mil<br>
+        ${formatNumber(result.externalWidthMm)} mm <br>
+        ${formatNumber(result.externalWidthUm)} µm
     `;
 
   document.getElementById("tw_externalResistance").textContent =

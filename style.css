@@ -453,19 +453,30 @@ header p {
     height: 400px; /* Taller for the main chart */
 }
 
-/* Half width for smaller charts */
+
+
+/* Update this class in style.css */
 .half-width {
     width: calc(50% - 10px);
-    height: 300px;
+    height: 380px; /* Increased from 300px to 380px */
+    min-height: 380px;
+    display: flex;
+    flex-direction: column;
 }
 
-/* On mobile, make everything full width */
+/* Ensure the canvas fills the space */
+.chart-container canvas {
+    flex-grow: 1;
+    width: 100% !important;
+    height: 100% !important;
+}
+
 @media (max-width: 768px) {
     .half-width {
         width: 100%;
+        height: 350px; /* Slightly smaller on mobile but still big */
     }
 }
-
 
 
 

@@ -42,7 +42,7 @@ function generateRangeData(originalInputs, originalResults) {
     
     // Range: Start from 0 up to Target + 10
     const startCurrent = 0; 
-    const endCurrent = Math.ceil(targetCurrent + 10);
+    const endCurrent = Math.ceil(targetCurrent + 0);
     
     // --- NEW: Auto Set Step Size ---
     const stepSize = getAutoStepSize(endCurrent); 
@@ -198,7 +198,7 @@ function renderMasterChart(data) {
             plugins: {
                 title: {
                     display: true,
-                    text: 'PCB Motor Performance Master Graph',
+                    text: 'Performance Master Graph',
                     font: { size: 16, weight: 'bold' },
                     color: '#333'
                 },
@@ -295,12 +295,55 @@ function renderMasterChart(data) {
     });
 }
 
+
+
+// Loss Chart - Fixed Text Size & Thinner Ring
 function renderLossChart(results) {
     const ctx = document.getElementById('lossChart').getContext('2d');
     if (lossChartInstance) lossChartInstance.destroy();
 
+    // Custom Plugin to draw text in the center
+    const centerTextPlugin = {
+        id: 'centerText',
+        beforeDraw: function(chart) {
+            const width = chart.width,
+                height = chart.height,
+                ctx = chart.ctx;
+
+            ctx.restore();
+            
+            // --- 1. Label: "Total Loss" (Small & Grey) ---
+            // Isko chota karne ke liye maine divisor badha diya (height / 200)
+            const fontSizeLabel = (height / 200).toFixed(2); 
+            ctx.font = "bold " + fontSizeLabel + "em sans-serif";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "#95a5a6"; // Light Grey color
+
+            const text1 = "Total Loss";
+            const textX1 = Math.round((width - ctx.measureText(text1).width) / 2);
+            // Height adjustment: Thoda upar rakhenge
+            const textY1 = height / 2 - (height * 0.12); 
+            ctx.fillText(text1, textX1, textY1);
+
+            // --- 2. Value: "413.6 W" (Bold & Dark) ---
+            // Isko bhi adjust kiya taaki hole mein fit ho jaye (height / 130)
+            const fontSizeValue = (height / 200).toFixed(2); 
+            ctx.font = "bold " + fontSizeValue + "em sans-serif";
+            ctx.fillStyle = "#2c3e50"; // Dark Blue-Grey color
+
+            const text2 = results.totalLoss.toFixed(1) + " W";
+            const textX2 = Math.round((width - ctx.measureText(text2).width) / 2);
+            // Height adjustment: Thoda neeche rakhenge
+            const textY2 = height / 2 + (height * 0.08); 
+            ctx.fillText(text2, textX2, textY2);
+
+            ctx.save();
+        }
+    };
+
     lossChartInstance = new Chart(ctx, {
         type: 'doughnut',
+        plugins: [centerTextPlugin], 
         data: {
             labels: ['Copper Loss', 'Core Loss', 'Mech Loss', 'Stray Loss'],
             datasets: [{
@@ -310,21 +353,75 @@ function renderLossChart(results) {
                     results.mechanicalLoss,
                     results.strayLoss
                 ],
-                backgroundColor: ['#e74c3c', '#3498db', '#f1c40f', '#9b59b6'],
-                borderWidth: 1
+                backgroundColor: [
+                    '#e74c3c', // Red
+                    '#3498db', // Blue
+                    '#f1c40f', // Yellow
+                    '#9b59b6'  // Purple
+                ],
+                hoverBackgroundColor: [
+                    '#c0392b',
+                    '#2980b9',
+                    '#f39c12',
+                    '#8e44ad'
+                ],
+                borderWidth: 4,
+                borderColor: '#ffffff',
+                hoverOffset: 15,
+                
+                // ⬇️ YEH IMPORTANT HAI:
+                // Isko 85% karne se ring patli ho jayegi aur beech me jagah banegi
+                cutout: '65%'    
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false, 
+            layout: {
+                padding: 15
+            },
             plugins: {
-                legend: { position: 'right' },
-                title: { display: true, text: `Total Loss: ${results.totalLoss.toFixed(2)} W` }
+                legend: {
+                    position: 'bottom', 
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        font: {
+                            size: 11, // Legend font thoda chota kiya
+                            weight: '500'
+                        }
+                    }
+                },
+                title: {
+                    display: false 
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    titleColor: '#333',
+                    bodyColor: '#333',
+                    borderColor: '#ddd',
+                    borderWidth: 1,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) { label += ': '; }
+                            let value = context.parsed;
+                            let total = context.chart._metasets[context.datasetIndex].total;
+                            let percentage = ((value / total) * 100).toFixed(1) + "%";
+                            return label + value.toFixed(2) + " W (" + percentage + ")";
+                        }
+                    }
+                }
             }
         }
     });
 }
 
+
+
+// --- TRACE DISTRIBUTION CHART (Professional Upgrade) ---
 function renderTraceDistChart() {
+    // 1. Data Fetching (Same as before)
     const intW = parseFloat(document.getElementById('tw_internalWidth').innerText) || 0;
     const extW = parseFloat(document.getElementById('tw_externalWidth').innerText) || 0;
     
@@ -332,8 +429,22 @@ function renderTraceDistChart() {
     const extP = parseFloat(document.getElementById('tw_externalPower').innerText) || 0;
 
     const ctx = document.getElementById('traceDistChart').getContext('2d');
+    
+    // Destroy old chart if exists
     if (traceDistChartInstance) traceDistChartInstance.destroy();
 
+    // 2. Setup Gradients (Premium Look)
+    // Blue Gradient for Width
+    let gradientWidth = ctx.createLinearGradient(0, 0, 0, 400);
+    gradientWidth.addColorStop(0, 'rgba(44, 62, 80, 0.9)');  // Dark Blue Top
+    gradientWidth.addColorStop(1, 'rgba(44, 62, 80, 0.6)');  // Lighter Blue Bottom
+
+    // Red/Orange Gradient for Power
+    let gradientPower = ctx.createLinearGradient(0, 0, 0, 400);
+    gradientPower.addColorStop(0, 'rgba(231, 76, 60, 0.9)'); // Red Top
+    gradientPower.addColorStop(1, 'rgba(231, 76, 60, 0.6)'); // Lighter Red Bottom
+
+    // 3. Render Chart
     traceDistChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -342,37 +453,108 @@ function renderTraceDistChart() {
                 {
                     label: 'Required Width (mil)',
                     data: [intW, extW],
-                    backgroundColor: '#34495e',
-                    yAxisID: 'y'
+                    backgroundColor: gradientWidth,
+                    borderColor: '#2c3e50',
+                    borderWidth: 1,
+                    borderRadius: 6,       // Rounded Corners
+                    barPercentage: 0.6,    // Slimmer bars
+                    categoryPercentage: 0.8,
+                    yAxisID: 'y'           // Links to Left Axis
                 },
                 {
                     label: 'Power Loss (W)',
                     data: [intP, extP],
-                    backgroundColor: '#e74c3c',
-                    yAxisID: 'y1'
+                    backgroundColor: gradientPower,
+                    borderColor: '#c0392b',
+                    borderWidth: 1,
+                    borderRadius: 6,       // Rounded Corners
+                    barPercentage: 0.6,    // Slimmer bars
+                    categoryPercentage: 0.8,
+                    yAxisID: 'y1'          // Links to Right Axis
                 }
             ]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false, // Fills the container
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true, // Circle instead of box
+                        padding: 20,
+                        font: { size: 12, weight: 'bold' }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    titleColor: '#333',
+                    bodyColor: '#333',
+                    borderColor: '#ddd',
+                    borderWidth: 1,
+                    padding: 10,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            let value = context.parsed.y;
+                            return " " + label + ": " + value.toFixed(2);
+                        }
+                    }
+                }
+            },
             scales: {
+                x: {
+                    grid: {
+                        display: false // Remove vertical grid lines (cleaner)
+                    },
+                    ticks: {
+                        font: { weight: 'bold' },
+                        color: '#555'
+                    }
+                },
+                // LEFT AXIS (Width - Blue)
                 y: {
                     type: 'linear',
                     display: true,
                     position: 'left',
-                    title: { display: true, text: 'Width (mil)' }
+                    title: { 
+                        display: true, 
+                        text: 'Width (mil)',
+                        color: '#2c3e50',
+                        font: { weight: 'bold' }
+                    },
+                    ticks: { color: '#2c3e50' },
+                    grid: {
+                        color: '#f0f0f0', // Very light grey grid
+                        borderDash: [5, 5] // Dashed lines
+                    }
                 },
+                // RIGHT AXIS (Power - Red)
                 y1: {
                     type: 'linear',
                     display: true,
                     position: 'right',
-                    title: { display: true, text: 'Power Loss (W)' },
-                    grid: { drawOnChartArea: false }
+                    title: { 
+                        display: true, 
+                        text: 'Power Loss (W)',
+                        color: '#c0392b',
+                        font: { weight: 'bold' }
+                    },
+                    ticks: { color: '#c0392b' },
+                    grid: {
+                        drawOnChartArea: false // Hide grid for right axis (avoids clutter)
+                    }
                 }
             }
         }
     });
 }
+
+
 
 function renderTorqueRpmChart(data) {
     const ctx = document.getElementById('torqueRpmChart').getContext('2d');
