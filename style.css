@@ -108,6 +108,15 @@ header p {
 }
 
 
+/* --- FIX: Round the top corners of the blue header --- */
+.header-row .grid-cell:first-child {
+    border-top-left-radius: 5px;
+}
+
+.header-row .grid-cell:last-child {
+    border-top-right-radius: 5px;
+}
+
 .category-row {
     background-color: #3498db; 
     font-weight: 600;
@@ -500,3 +509,4 @@ header p {
         padding: 15px;
     }
 }
+
