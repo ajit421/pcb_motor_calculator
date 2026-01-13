@@ -18,6 +18,7 @@ body {
 }
 
 header {
+    position: relative;
     text-align: center;
     margin-bottom: 30px;
     padding-bottom: 20px;
@@ -510,3 +511,40 @@ header p {
     }
 }
 
+
+/* --- LOGO STYLES --- */
+
+.company-logo {
+
+    position: absolute;  /* Logo ko free movement deta hai */
+    top: 0px;           /* Upar se 10px neeche */
+    left: 20px;
+    
+
+
+    height: 100px;  /* Adjusts the size of the logo */
+    width: 100px;   /* Keeps the logo shape correct */
+    object-fit: cover; /* Ensures the image covers the space */
+    border-radius: 50%; /* Makes the logo circular */
+    background-color: #ffffff; /* Adds a white background */
+    /* border: 2px solid #22500c; */
+    margin-bottom: 15px; /* Adds space between logo and text */
+    cursor: pointer; /* Changes mouse cursor to a hand pointer */
+    transition: transform 0.5s ease; /* Smooth movement */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2); /* Adds a subtle shadow */
+}
+
+/* This defines the Spin Animation */
+@keyframes spinOneRound {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* When the cursor touches the logo, run the animation */
+.company-logo:hover {
+    animation: spinOneRound 0.6s ease-in-out;
+}
