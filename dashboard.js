@@ -42,7 +42,8 @@ function generateRangeData(originalInputs, originalResults) {
 
     // Range: Start from 0 up to Target + 10
     const startCurrent = 0;
-    const endCurrent = Math.ceil(targetCurrent + 0);
+    const appendCurrent = targetCurrent;
+    const endCurrent = Math.ceil(targetCurrent + appendCurrent);
 
     // --- NEW: Auto Set Step Size ---
     const stepSize = getAutoStepSize(endCurrent);
@@ -104,6 +105,8 @@ function generateRangeData(originalInputs, originalResults) {
 
     return { labels, torque, rpm, efficiency, powerIn, powerOut, totalLoss };
 }
+
+
 
 // ---------------- CHART RENDER FUNCTIONS ---------------- //
 
@@ -232,20 +235,21 @@ function renderMasterChart(data) {
                 x: {
                     title: { display: true, text: 'Current (A)', color: '#666', font: { weight: 'bold' } },
                     // grid: { display: false },
-                    grid: { color: '#e0e0e0'},
+                    grid: { color: '#e0e0e0' },
                     ticks: {
                         maxRotation: 0, // Keep labels horizontal
                         autoSkip: true,
                         maxTicksLimit: 12 // Ensure "not show multiple steps" (avoids crowding)
                     }
                 },
-                
+
 
                 // --- LEFT AXES ---
                 y_torque: {
                     type: 'linear',
                     display: true,
                     position: 'left',
+                    min: 0,
                     title: { display: true, text: 'Torque (N.m)', color: '#000000' },
                     ticks: { color: '#000000' },
                     grid: { color: '#e0e0e0' }
@@ -264,6 +268,7 @@ function renderMasterChart(data) {
                     type: 'linear',
                     display: true,
                     position: 'left',
+                    min: 0,
                     grid: { drawOnChartArea: false },
                     title: { display: true, text: 'Loss (W)', color: '#FF8C00' },
                     ticks: { color: '#FF8C00' }
@@ -284,6 +289,7 @@ function renderMasterChart(data) {
                     type: 'linear',
                     display: true,
                     position: 'right',
+                    min: 0,
                     grid: { drawOnChartArea: false },
                     title: { display: true, text: 'Power Out (W)', color: '#FF1493' },
                     ticks: { color: '#FF1493' }
@@ -292,6 +298,7 @@ function renderMasterChart(data) {
                     type: 'linear',
                     display: true,
                     position: 'right',
+                    min: 0,
                     grid: { drawOnChartArea: false },
                     title: { display: true, text: 'Power In (W)', color: '#FFD700' },
                     ticks: { color: '#FFD700' }

@@ -450,7 +450,8 @@ header p {
 /* Full width for the Master Chart */
 .full-width {
     width: 100%;
-    height: 400px; /* Taller for the main chart */
+    height: 450px; /* Taller for the main chart */
+    /* min-height: 200px; */
 }
 
 
