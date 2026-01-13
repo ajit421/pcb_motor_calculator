@@ -39,13 +39,13 @@ function getAutoStepSize(maxCurrent) {
  */
 function generateRangeData(originalInputs, originalResults) {
     const targetCurrent = originalInputs.current;
-    
+
     // Range: Start from 0 up to Target + 10
-    const startCurrent = 0; 
+    const startCurrent = 0;
     const endCurrent = Math.ceil(targetCurrent + 0);
-    
+
     // --- NEW: Auto Set Step Size ---
-    const stepSize = getAutoStepSize(endCurrent); 
+    const stepSize = getAutoStepSize(endCurrent);
 
     // Arrays to store data
     const labels = []; // Current (A)
@@ -54,7 +54,7 @@ function generateRangeData(originalInputs, originalResults) {
     const efficiency = [];
     const powerIn = [];
     const powerOut = [];
-    const totalLoss = []; 
+    const totalLoss = [];
 
     // Estimate Resistance for Copper Loss calculation (R = P / I^2)
     let estimatedR = 0.1;
@@ -83,15 +83,15 @@ function generateRangeData(originalInputs, originalResults) {
 
         // Push data
         // Format label: Remove decimals if it's an integer (e.g. "10" instead of "10.0")
-        labels.push(Number.isInteger(i) ? i.toString() : i.toFixed(1)); 
-        
+        labels.push(Number.isInteger(i) ? i.toString() : i.toFixed(1));
+
         torque.push(res.torque);
         rpm.push(res.rpm);
-        
+
         // Cap efficiency at 100 for graph visual safety
         let eff = res.actualEfficiency;
-        if(eff > 100) eff = 100;
-        if(eff < 0) eff = 0;
+        if (eff > 100) eff = 100;
+        if (eff < 0) eff = 0;
         efficiency.push(eff);
 
         powerIn.push(res.powerIn);
@@ -109,7 +109,7 @@ function generateRangeData(originalInputs, originalResults) {
 
 function renderMasterChart(data) {
     const ctx = document.getElementById('masterChart').getContext('2d');
-    
+
     if (masterChartInstance) masterChartInstance.destroy();
 
     masterChartInstance = new Chart(ctx, {
@@ -124,7 +124,7 @@ function renderMasterChart(data) {
                     borderColor: '#000000', // Black
                     backgroundColor: '#000000',
                     borderWidth: 2,
-                    yAxisID: 'y_torque', 
+                    yAxisID: 'y_torque',
                     tension: 0.4,
                     pointRadius: 0,
                     hoverRadius: 6
@@ -135,7 +135,7 @@ function renderMasterChart(data) {
                     borderColor: '#8A2BE2', // Purple
                     backgroundColor: '#8A2BE2',
                     borderWidth: 2,
-                    yAxisID: 'y_rpm', 
+                    yAxisID: 'y_rpm',
                     tension: 0.4,
                     pointRadius: 0,
                     hoverRadius: 6
@@ -146,12 +146,12 @@ function renderMasterChart(data) {
                     borderColor: '#FF8C00', // Orange
                     backgroundColor: '#FF8C00',
                     borderWidth: 2,
-                    yAxisID: 'y_loss', 
+                    yAxisID: 'y_loss',
                     tension: 0.4,
                     pointRadius: 0,
                     hoverRadius: 6
                 },
-                
+
                 // --- RIGHT AXIS DATASETS ---
                 {
                     label: 'Efficiency (%)',
@@ -159,7 +159,7 @@ function renderMasterChart(data) {
                     borderColor: '#00B050', // Green
                     backgroundColor: '#00B050',
                     borderWidth: 2,
-                    yAxisID: 'y_eff', 
+                    yAxisID: 'y_eff',
                     tension: 0.4,
                     pointRadius: 0,
                     hoverRadius: 6
@@ -170,7 +170,7 @@ function renderMasterChart(data) {
                     borderColor: '#FF1493', // Pink
                     backgroundColor: '#FF1493',
                     borderWidth: 2,
-                    yAxisID: 'y_powerout', 
+                    yAxisID: 'y_powerout',
                     tension: 0.4,
                     pointRadius: 0,
                     hoverRadius: 6
@@ -181,7 +181,7 @@ function renderMasterChart(data) {
                     borderColor: '#FFD700', // Yellow
                     backgroundColor: '#FFD700',
                     borderWidth: 2,
-                    yAxisID: 'y_powerin', 
+                    yAxisID: 'y_powerin',
                     tension: 0.4,
                     pointRadius: 0,
                     hoverRadius: 6
@@ -204,7 +204,7 @@ function renderMasterChart(data) {
                 },
                 legend: {
                     position: 'top',
-                    labels: { usePointStyle: true, boxWidth: 8 }
+                    labels: { usePointStyle: true, boxWidth: 20 }
                 },
                 tooltip: {
                     backgroundColor: 'rgba(255, 255, 255, 0.9)',
@@ -213,46 +213,52 @@ function renderMasterChart(data) {
                     borderColor: '#ddd',
                     borderWidth: 1,
                     callbacks: {
-                        label: function(context) {
+                        label: function (context) {
                             let label = context.dataset.label || '';
                             if (label) {
                                 label += ': ';
                             }
                             if (context.parsed.y !== null) {
-                                label += context.parsed.y.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                                label += context.parsed.y.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                             }
                             return label;
                         }
                     }
                 }
             },
+
+
             scales: {
                 x: {
-                    title: { display: true, text: 'Current (A)', color: '#555', font: { weight: 'bold' } },
-                    grid: { color: '#f0f0f0' },
+                    title: { display: true, text: 'Current (A)', color: '#666', font: { weight: 'bold' } },
+                    // grid: { display: false },
+                    grid: { color: '#e0e0e0'},
                     ticks: {
                         maxRotation: 0, // Keep labels horizontal
                         autoSkip: true,
-                        maxTicksLimit: 20 // Ensure "not show multiple steps" (avoids crowding)
+                        maxTicksLimit: 12 // Ensure "not show multiple steps" (avoids crowding)
                     }
                 },
                 
+
                 // --- LEFT AXES ---
                 y_torque: {
                     type: 'linear',
                     display: true,
                     position: 'left',
                     title: { display: true, text: 'Torque (N.m)', color: '#000000' },
-                    ticks: { color: '#000000' }, 
+                    ticks: { color: '#000000' },
                     grid: { color: '#e0e0e0' }
                 },
                 y_rpm: {
                     type: 'linear',
                     display: true,
                     position: 'left',
+                    min: 0,
+                    // max: 10000,
                     grid: { drawOnChartArea: false },
                     title: { display: true, text: 'RPM', color: '#8A2BE2' },
-                    ticks: { color: '#8A2BE2' } 
+                    ticks: { color: '#8A2BE2' }
                 },
                 y_loss: {
                     type: 'linear',
@@ -260,7 +266,7 @@ function renderMasterChart(data) {
                     position: 'left',
                     grid: { drawOnChartArea: false },
                     title: { display: true, text: 'Loss (W)', color: '#FF8C00' },
-                    ticks: { color: '#FF8C00' } 
+                    ticks: { color: '#FF8C00' }
                 },
 
                 // --- RIGHT AXES ---
@@ -272,7 +278,7 @@ function renderMasterChart(data) {
                     max: 100,
                     grid: { drawOnChartArea: false },
                     title: { display: true, text: 'Efficiency (%)', color: '#00B050' },
-                    ticks: { color: '#00B050' } 
+                    ticks: { color: '#00B050' }
                 },
                 y_powerout: {
                     type: 'linear',
@@ -280,7 +286,7 @@ function renderMasterChart(data) {
                     position: 'right',
                     grid: { drawOnChartArea: false },
                     title: { display: true, text: 'Power Out (W)', color: '#FF1493' },
-                    ticks: { color: '#FF1493' } 
+                    ticks: { color: '#FF1493' }
                 },
                 y_powerin: {
                     type: 'linear',
@@ -288,7 +294,7 @@ function renderMasterChart(data) {
                     position: 'right',
                     grid: { drawOnChartArea: false },
                     title: { display: true, text: 'Power In (W)', color: '#FFD700' },
-                    ticks: { color: '#FFD700' } 
+                    ticks: { color: '#FFD700' }
                 }
             }
         }
@@ -305,16 +311,16 @@ function renderLossChart(results) {
     // Custom Plugin to draw text in the center
     const centerTextPlugin = {
         id: 'centerText',
-        beforeDraw: function(chart) {
+        beforeDraw: function (chart) {
             const width = chart.width,
                 height = chart.height,
                 ctx = chart.ctx;
 
             ctx.restore();
-            
+
             // --- 1. Label: "Total Loss" (Small & Grey) ---
             // Isko chota karne ke liye maine divisor badha diya (height / 200)
-            const fontSizeLabel = (height / 200).toFixed(2); 
+            const fontSizeLabel = (height / 200).toFixed(2);
             ctx.font = "bold " + fontSizeLabel + "em sans-serif";
             ctx.textBaseline = "middle";
             ctx.fillStyle = "#95a5a6"; // Light Grey color
@@ -322,19 +328,19 @@ function renderLossChart(results) {
             const text1 = "Total Loss";
             const textX1 = Math.round((width - ctx.measureText(text1).width) / 2);
             // Height adjustment: Thoda upar rakhenge
-            const textY1 = height / 2 - (height * 0.12); 
+            const textY1 = height / 2 - (height * 0.12);
             ctx.fillText(text1, textX1, textY1);
 
             // --- 2. Value: "413.6 W" (Bold & Dark) ---
             // Isko bhi adjust kiya taaki hole mein fit ho jaye (height / 130)
-            const fontSizeValue = (height / 200).toFixed(2); 
+            const fontSizeValue = (height / 200).toFixed(2);
             ctx.font = "bold " + fontSizeValue + "em sans-serif";
             ctx.fillStyle = "#2c3e50"; // Dark Blue-Grey color
 
             const text2 = results.totalLoss.toFixed(1) + " W";
             const textX2 = Math.round((width - ctx.measureText(text2).width) / 2);
             // Height adjustment: Thoda neeche rakhenge
-            const textY2 = height / 2 + (height * 0.08); 
+            const textY2 = height / 2 + (height * 0.08);
             ctx.fillText(text2, textX2, textY2);
 
             ctx.save();
@@ -343,7 +349,7 @@ function renderLossChart(results) {
 
     lossChartInstance = new Chart(ctx, {
         type: 'doughnut',
-        plugins: [centerTextPlugin], 
+        plugins: [centerTextPlugin],
         data: {
             labels: ['Copper Loss', 'Core Loss', 'Mech Loss', 'Stray Loss'],
             datasets: [{
@@ -368,21 +374,21 @@ function renderLossChart(results) {
                 borderWidth: 4,
                 borderColor: '#ffffff',
                 hoverOffset: 15,
-                
+
                 // ⬇️ YEH IMPORTANT HAI:
                 // Isko 85% karne se ring patli ho jayegi aur beech me jagah banegi
-                cutout: '65%'    
+                cutout: '65%'
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false, 
+            maintainAspectRatio: false,
             layout: {
                 padding: 15
             },
             plugins: {
                 legend: {
-                    position: 'bottom', 
+                    position: 'bottom',
                     labels: {
                         padding: 20,
                         usePointStyle: true,
@@ -393,7 +399,7 @@ function renderLossChart(results) {
                     }
                 },
                 title: {
-                    display: false 
+                    display: false
                 },
                 tooltip: {
                     backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -402,7 +408,7 @@ function renderLossChart(results) {
                     borderColor: '#ddd',
                     borderWidth: 1,
                     callbacks: {
-                        label: function(context) {
+                        label: function (context) {
                             let label = context.label || '';
                             if (label) { label += ': '; }
                             let value = context.parsed;
@@ -424,16 +430,16 @@ function renderLossChart(results) {
 function renderTraceDistChart() {
     const intW = parseFloat(document.getElementById('tw_internalWidth').innerText) || 0;
     const extW = parseFloat(document.getElementById('tw_externalWidth').innerText) || 0;
-    
+
     const intP = parseFloat(document.getElementById('tw_internalPower').innerText) || 0;
     const extP = parseFloat(document.getElementById('tw_externalPower').innerText) || 0;
 
     const ctx = document.getElementById('traceDistChart').getContext('2d');
-    
+
     if (traceDistChartInstance) traceDistChartInstance.destroy();
 
     // --- 1. Create Premium Gradients ---
-    
+
     // Gradient A: Width (Cool Cyan-Blue)
     let gradientWidth = ctx.createLinearGradient(0, 0, 0, 400);
     gradientWidth.addColorStop(0, '#4FACFE');  // Cyan Top
@@ -456,7 +462,7 @@ function renderTraceDistChart() {
                     borderColor: '#4FACFE',
                     borderWidth: 1,
                     // Sirf upar se round karne ke liye:
-                    borderRadius: { topLeft: 10, topRight: 10 }, 
+                    borderRadius: { topLeft: 10, topRight: 10 },
                     barPercentage: 0.5,
                     categoryPercentage: 0.8,
                     yAxisID: 'y'
@@ -500,7 +506,7 @@ function renderTraceDistChart() {
                     cornerRadius: 8,
                     displayColors: true,
                     callbacks: {
-                        label: function(context) {
+                        label: function (context) {
                             let label = context.dataset.label || '';
                             let value = context.parsed.y;
                             // Tooltip me Unit dikhane ke liye
@@ -523,11 +529,11 @@ function renderTraceDistChart() {
                     type: 'linear',
                     display: true,
                     position: 'left',
-                    title: { display: true, text: 'Width (mil)', color: '#4FACFE', font: {weight:'bold'} },
+                    title: { display: true, text: 'Width (mil)', color: '#4FACFE', font: { weight: 'bold' } },
                     grid: { color: '#f3f3f3', borderDash: [5, 5] },
-                    ticks: { 
+                    ticks: {
                         color: '#4FACFE',
-                        callback: function(value) { return value + ' mil'; } // Axis par unit
+                        callback: function (value) { return value + ' mil'; } // Axis par unit
                     }
                 },
                 // Right Axis (Power)
@@ -535,11 +541,11 @@ function renderTraceDistChart() {
                     type: 'linear',
                     display: true,
                     position: 'right',
-                    title: { display: true, text: 'Power Loss (W)', color: '#FF0844', font: {weight:'bold'} },
+                    title: { display: true, text: 'Power Loss (W)', color: '#FF0844', font: { weight: 'bold' } },
                     grid: { drawOnChartArea: false },
-                    ticks: { 
+                    ticks: {
                         color: '#FF0844',
-                        callback: function(value) { return value + ' W'; } // Axis par unit
+                        callback: function (value) { return value + ' W'; } // Axis par unit
                     }
                 }
             }
@@ -551,7 +557,7 @@ function renderTraceDistChart() {
 // --- TORQUE VS RPM CHART (Premium Gradient Look) ---
 function renderTorqueRpmChart(data) {
     const ctx = document.getElementById('torqueRpmChart').getContext('2d');
-    
+
     // Purana chart delete karein taaki glitch na ho
     if (torqueRpmChartInstance) torqueRpmChartInstance.destroy();
 
@@ -601,10 +607,10 @@ function renderTorqueRpmChart(data) {
                     padding: 10,
                     displayColors: false,
                     callbacks: {
-                        title: function(context) {
+                        title: function (context) {
                             return 'RPM: ' + context[0].parsed.x.toFixed(4);
                         },
-                        label: function(context) {
+                        label: function (context) {
                             return 'Torque: ' + context.parsed.y.toFixed(4) + ' N.m';
                         }
                     }
@@ -618,9 +624,9 @@ function renderTorqueRpmChart(data) {
                         display: false, // Vertical lines hata di (Cleaner)
                         drawBorder: false
                     },
-                    title: { 
-                        display: true, 
-                        text: 'Speed (RPM)', 
+                    title: {
+                        display: true,
+                        text: 'Speed (RPM)',
                         color: '#555',
                         font: { weight: 'bold' }
                     }
@@ -630,9 +636,9 @@ function renderTorqueRpmChart(data) {
                         color: '#f0f0f0', // Light horizontal lines
                         borderDash: [5, 5] // Dashed lines
                     },
-                    title: { 
-                        display: true, 
-                        text: 'Torque (N.m)', 
+                    title: {
+                        display: true,
+                        text: 'Torque (N.m)',
                         color: '#8e44ad',
                         font: { weight: 'bold' }
                     },
@@ -644,9 +650,25 @@ function renderTorqueRpmChart(data) {
 }
 
 
+
+// --- POWER CHART (Premium Gradient & Smart Analysis) ---
 function renderPowerChart(data) {
     const ctx = document.getElementById('powerChart').getContext('2d');
+
+    // Purana chart destroy karo
     if (powerChartInstance) powerChartInstance.destroy();
+
+    // 1. CREATE GRADIENTS (Jadu yahan hai!)
+
+    // Gradient for Power IN (Gold/Amber - Energy Source)
+    let gradientIn = ctx.createLinearGradient(0, 0, 0, 400);
+    gradientIn.addColorStop(0, 'rgba(255, 193, 7, 0.5)'); // Top (Visible)
+    gradientIn.addColorStop(1, 'rgba(255, 193, 7, 0.0)'); // Bottom (Fade out)
+
+    // Gradient for Power OUT (Neon Pink - Output)
+    let gradientOut = ctx.createLinearGradient(0, 0, 0, 400);
+    gradientOut.addColorStop(0, 'rgba(255, 20, 147, 0.6)'); // Top (Darker)
+    gradientOut.addColorStop(1, 'rgba(255, 20, 147, 0.0)'); // Bottom (Fade out)
 
     powerChartInstance = new Chart(ctx, {
         type: 'line',
@@ -654,30 +676,114 @@ function renderPowerChart(data) {
             labels: data.labels,
             datasets: [
                 {
-                    label: 'Power In (kW)',
+                    label: 'Power In (Input)',
                     data: data.powerIn,
-                    borderColor: '#FFD700',
-                    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                    borderColor: '#FFC107', // Bright Amber Border
+                    borderWidth: 3,
+                    backgroundColor: gradientIn,
                     fill: true,
-                    tension: 0.4,
-                    pointRadius: 0
+                    tension: 0.4, // Smooth Curve
+                    pointRadius: 0, // Clean look (points hidden)
+                    pointHoverRadius: 6,
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#FFC107',
+                    order: 2 // Isko peeche rakhenge
                 },
                 {
-                    label: 'Power Out (kW)',
+                    label: 'Power Out (Output)',
                     data: data.powerOut,
-                    borderColor: '#FF1493',
-                    backgroundColor: 'rgba(255, 20, 147, 0.1)',
+                    borderColor: '#FF1493', // Deep Pink Border
+                    borderWidth: 3,
+                    backgroundColor: gradientOut,
                     fill: true,
                     tension: 0.4,
-                    pointRadius: 0
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#FF1493',
+                    order: 1 // Isko upar rakhenge taaki dark pink clearly dikhe
                 }
             ]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    align: 'end',
+                    labels: {
+                        usePointStyle: true,
+                        boxWidth: 8,
+                        font: { size: 12, weight: 'bold' },
+                        color: '#555'
+                    }
+                },
+                title: {
+                    display: false // Title hata diya clean look ke liye
+                },
+                tooltip: {
+                    // --- SMART TOOLTIP SETTINGS ---
+                    backgroundColor: 'rgba(30, 30, 30, 0.9)', // Dark background
+                    titleColor: '#fff',
+                    bodyColor: '#ecf0f1',
+                    padding: 12,
+                    cornerRadius: 8,
+                    displayColors: true,
+                    callbacks: {
+                        label: function (context) {
+                            let label = context.dataset.label || '';
+                            let value = context.parsed.y;
+                            return ' ' + label + ': ' + value.toFixed(3) + ' kW';
+                        },
+                        // Yahan hum Magic karenge: Footer me Loss aur Efficiency dikhayenge
+                        afterBody: function (tooltipItems) {
+                            // Data fetch karo
+                            let pIn = 0;
+                            let pOut = 0;
+
+                            tooltipItems.forEach(item => {
+                                if (item.datasetIndex === 0) pIn = item.parsed.y;
+                                if (item.datasetIndex === 1) pOut = item.parsed.y;
+                            });
+
+                            if (pIn > 0) {
+                                let loss = (pIn - pOut).toFixed(3);
+                                let eff = ((pOut / pIn) * 100).toFixed(2);
+                                return '-------------------------------------------\n' +
+                                    '⚠ Power Loss: ' + loss + ' kW\n' +
+                                    '⚡ Efficiency:  ' + eff + '%';
+                            }
+                        }
+                    }
+                }
+            },
             scales: {
-                x: { title: { display: true, text: 'Current (A)' } },
-                y: { title: { display: true, text: 'Power (kW)' } }
+                x: {
+                    grid: {
+                        display: false, // Vertical lines hata di (Cleaner Look)
+                    },
+                    ticks: {
+                        font: { weight: 'bold' },
+                        color: '#666'
+                    },
+                    title: { display: true, text: 'Current (A)', font: { weight: 'bold' }, color: '#444' }
+                },
+                y: {
+                    grid: {
+                        color: '#f0f0f0',
+                        borderDash: [5, 5] // Dashed horizontal lines
+                    },
+                    ticks: {
+                        color: '#666'
+                    },
+                    title: { display: true, text: 'Power (kW)', font: { weight: 'bold' }, color: '#444' },
+                    beginAtZero: true
+                }
             }
         }
     });
