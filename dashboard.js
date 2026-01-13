@@ -210,9 +210,9 @@ function renderMasterChart(data) {
                     labels: { usePointStyle: true, boxWidth: 20 }
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                    titleColor: '#333',
-                    bodyColor: '#333',
+                    backgroundColor: '#1e1e1ee6',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
                     borderColor: '#ddd',
                     borderWidth: 1,
                     callbacks: {
@@ -379,7 +379,7 @@ function renderLossChart(results) {
                     '#8e44ad'
                 ],
                 borderWidth: 4,
-                borderColor: '#ffffff',
+                borderColor: '#1e1e1ee6',
                 hoverOffset: 15,
 
                 // ⬇️ YEH IMPORTANT HAI:
@@ -409,9 +409,9 @@ function renderLossChart(results) {
                     display: false
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    titleColor: '#333',
-                    bodyColor: '#333',
+                    backgroundColor: '#1e1e1ee6',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
                     borderColor: '#ddd',
                     borderWidth: 1,
                     callbacks: {
@@ -509,6 +509,7 @@ function renderTraceDistChart() {
                     backgroundColor: 'rgba(30, 30, 30, 0.9)', // Dark tooltip
                     titleColor: '#fff',
                     bodyColor: '#fff',
+                    borderColor: '#ddd',
                     padding: 12,
                     cornerRadius: 8,
                     displayColors: true,
@@ -611,6 +612,7 @@ function renderTorqueRpmChart(data) {
                     backgroundColor: 'rgba(0, 0, 0, 0.8)', // Dark Tooltip
                     titleColor: '#fff',
                     bodyColor: '#fff',
+                    borderColor: '#ddd',
                     padding: 10,
                     displayColors: false,
                     callbacks: {
@@ -735,9 +737,10 @@ function renderPowerChart(data) {
                 },
                 tooltip: {
                     // --- SMART TOOLTIP SETTINGS ---
-                    backgroundColor: 'rgba(30, 30, 30, 0.9)', // Dark background
+                    backgroundColor: '#1e1e1ee6', // Dark background
                     titleColor: '#fff',
                     bodyColor: '#ecf0f1',
+                    borderColor: '#ddd',
                     padding: 12,
                     cornerRadius: 8,
                     displayColors: true,
