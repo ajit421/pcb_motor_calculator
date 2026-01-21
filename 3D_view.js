@@ -40,15 +40,16 @@ function init() {
 
     // 3. Renderer
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    const container = document.getElementById('canvas-container');
+    renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    document.getElementById('canvas-container').appendChild(renderer.domElement);
+    container.appendChild(renderer.domElement);
 
     // 4. Controls
     controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
+    controls.enableDamping = false; // Disable inertia as requested
     controls.dampingFactor = 0.05;
     controls.minDistance = 10;
     controls.maxDistance = 500;
@@ -386,9 +387,10 @@ function hideError() {
 }
 
 function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
+    const container = document.getElementById('canvas-container');
+    camera.aspect = container.clientWidth / container.clientHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(container.clientWidth, container.clientHeight);
 }
 
 function setupUIListeners() {
