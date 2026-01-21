@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Motor Visualization</title>
+    <link rel="stylesheet" href="3D_view.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/OBJExporter.js"></script>
+</head>
+<body>
+    <div id="canvas-container"></div>
+
+    <div id="controls-panel">
+        <div class="panel-header">
+            <h2>3D Motor View</h2>
+            <button id="syncBtn" class="btn primary">Sync Calculator Data</button>
+        </div>
+
+        <div class="stats-box">
+            <span id="poly-counter">Triangles: 0</span>
+        </div>
+
+        <div class="control-group">
+            <h3>Visualization</h3>
+            <label class="toggle-row">
+                <input type="checkbox" id="showStator" checked> PCB Stator
+            </label>
+            <label class="toggle-row">
+                <input type="checkbox" id="showTraces" checked> Copper Traces
+            </label>
+            <label class="toggle-row">
+                <input type="checkbox" id="showRotor" checked> Rotor & Magnets
+            </label>
+            <label class="toggle-row">
+                <input type="checkbox" id="showAxes" checked> Grid & Axis
+            </label>
+            <label class="toggle-row">
+                <input type="checkbox" id="animateRotor"> Animate Rotation
+            </label>
+            
+            <label class="control-label" style="margin-top:10px">Exploded View (Spread)</label>
+            <input type="range" id="explodeSlider" min="0" max="20" step="0.5" value="0">
+        </div>
+
+        <div class="control-group">
+            <h3>Parameters (mm)</h3>
+            
+            <label>Stator OD</label>
+            <input type="number" id="v_pcbStatorOD" step="0.1">
+
+            <label>Stator ID</label>
+            <input type="number" id="v_pcbStatorID" step="0.1">
+
+            <label>PCB Thickness</label>
+            <input type="number" id="v_pcbBoardThickness" step="0.1">
+
+            <label>Layer Count</label>
+            <input type="number" id="v_numPCBLayers" step="1">
+
+            <label>Rotor Height</label>
+            <input type="number" id="v_pmRotorHeight" step="0.1">
+
+            <label>Air Gap</label>
+            <input type="number" id="v_airGap" step="0.1">
+
+            <label>Trace Width</label>
+            <input type="number" id="v_traceWidthID" step="0.01">
+        </div>
+
+        <div class="action-buttons">
+            <button id="resetViewBtn" class="btn secondary">Reset Camera</button>
+            <button id="exportObjBtn" class="btn secondary">Export .OBJ</button>
+        </div>
+        
+        <div id="error-msg" class="error-toast" style="display:none;"></div>
+    </div>
+
+    <script src="3D_view.js"></script>
+</body>
+</html>

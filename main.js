@@ -1341,8 +1341,20 @@ document.addEventListener("DOMContentLoaded", function () {
       isSyncing = false;
     });
   }
+  // Inside main.js
+  const view3dBtn = document.getElementById('view3dBtn');
+  if (view3dBtn) {
+    view3dBtn.addEventListener('click', function () {
+      // 1. Ensure latest values are captured
+      const inputs = getMotorInputs();
 
-  // Sync 2: Copper Thickness (REMOVED as per new logic)
+      // 2. Save to local storage
+      localStorage.setItem('pcb_motor_data', JSON.stringify(inputs));
+
+      // 3. Open 3D View in new tab
+      window.open('3D_view.html', '_blank');
+    });
+  }
 });
 
 // --- HELPER FUNCTIONS FOR REPORTS (Move this to main.js) ---

@@ -1,0 +1,163 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1a1a1a;
+    color: #eee;
+}
+
+#canvas-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+}
+
+#controls-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 320px;
+    height: 100vh;
+    background: rgba(30, 30, 30, 0.95);
+    border-left: 1px solid #444;
+    padding: 20px;
+    overflow-y: auto;
+    z-index: 2;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #555;
+    padding-bottom: 15px;
+}
+
+.panel-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #fff;
+}
+
+.control-group {
+    margin-bottom: 25px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.control-group h3 {
+    margin-top: 0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    color: #8A2BE2;
+    /* Matching dashboard purple */
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+}
+
+label {
+    display: block;
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+    color: #ccc;
+}
+
+input[type="number"],
+input[type="range"] {
+    width: 100%;
+    background: #333;
+    border: 1px solid #555;
+    color: #fff;
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+}
+
+input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+.toggle-row {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 8px;
+}
+
+.stats-box {
+    display: flex;
+    gap: 15px;
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 20px;
+    background: #000;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+.btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    font-size: 0.85rem;
+}
+
+.btn.primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn.primary:hover {
+    background-color: #2980b9;
+}
+
+.btn.secondary {
+    background-color: #444;
+    color: white;
+    width: 48%;
+}
+
+.btn.secondary:hover {
+    background-color: #555;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.error-toast {
+    margin-top: 15px;
+    padding: 10px;
+    background: #e74c3c;
+    color: white;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* Scrollbar Styling */
+#controls-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+#controls-panel::-webkit-scrollbar-track {
+    background: #222;
+}
+
+#controls-panel::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
