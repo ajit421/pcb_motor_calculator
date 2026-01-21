@@ -1,94 +1,172 @@
-* {
+/* ==========================================================================
+   1. VARIABLES & RESET
+   ========================================================================== */
+:root {
+    /* Color Palette - Professional Engineering Theme */
+    --primary-color: #2c3e50;       /* Dark Navy */
+    --primary-light: #3b5e34;
+    --accent-color: #3498db;        /* Bright Blue */
+    --accent-hover: #b2b929;
+    --secondary-accent: #8e44ad;    /* Purple (3D/Special actions) */
+    --secondary-hover: #b2b929;
+    --success-color: #27ae60;
+    --success-hover: #b2b929;
+    --danger-color: #c0392b;
+    --bg-color: #e4e4e4;            /* Light Grey Background */
+    --surface-color: #fefefe;       /* Card Background */
+    --text-primary: #000000;
+    --text-secondary: #000000;
+    --border-color: #dfd5d5;
+    --input-bg: #ffffff;
+    --input-border: #26ae48;
+
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 20px rgba(0,0,0,0.15);
+
+    /* Radii */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-    background-color: #f5f5f5;
-    color: #333;
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
     line-height: 1.6;
+    font-size: 16px; /* Base size for readability */
+    -webkit-font-smoothing: antialiased;
 }
 
+/* ==========================================================================
+   2. LAYOUT & CONTAINER
+   ========================================================================== */
 .container {
+    width: 100%;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 20px;
-}
-
-header {
-    position: relative;
-    text-align: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #ddd;
-}
-
-header h1 {
-    color: #2c3e50;
-    margin-bottom: 10px;
-}
-
-header p {
-    color: #7f8c8d;
-    font-size: 1.1rem;
+    padding: var(--spacing-md);
 }
 
 .calculator-grid {
-    display: grid;
-    /* This is the change: from '1fr 1fr' to '1fr' to stack them vertically */
-    grid-template-columns: 1fr;
-    gap: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
 }
 
+/* ==========================================================================
+   3. HEADER
+   ========================================================================== */
+header {
+    background-color: var(--surface-color);
+    padding: var(--spacing-lg) var(--spacing-md);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+    position: relative;
+    border-bottom: 3px solid var(--accent-color);
+}
+
+header h1 {
+    color: var(--primary-color);
+    font-size: clamp(1.5rem, 4vw, 2.2rem); /* Fluid typography */
+    margin-bottom: var(--spacing-xs);
+}
+
+header p {
+    color: var(--text-secondary);
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+}
+
+.company-logo {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 50%;
+    margin-bottom: var(--spacing-sm);
+    transition: transform var(--transition-normal);
+}
+
+.company-logo:hover {
+    transform: rotate(360deg);
+}
+
+/* ==========================================================================
+   4. SECTIONS & CARDS
+   ========================================================================== */
 .section {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: var(--surface-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
     overflow: hidden;
+    margin-bottom: var(--spacing-lg);
+    border: 1px solid var(--border-color);
 }
 
 .section-header {
-    background-color: #2c89cc;
+    background: var(--primary-color);
     color: white;
-    padding: 15px 20px;
+    padding: var(--spacing-md) var(--spacing-lg);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
 }
-
 
 .section-header h2 {
-    font-size: 1.3rem;
-    font-weight: 500;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
 }
 
-.calculate-btn {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.3s;
-    margin-left: 25px;
+/* ==========================================================================
+   5. INPUT GRIDS & FORMS
+   ========================================================================== */
+/* Layout for the two main columns in Input Section */
+.input-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Mobile First: Stacked */
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg);
 }
 
-.calculate-btn:hover {
-    background-color: #2980b9;
-}
-
+/* Table-like Structure using CSS Grid for Inputs */
 .grid-container {
-    display: table;
-    width: 100%;
-    border-collapse: collapse;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    overflow: hidden;
 }
 
 .grid-row {
-    display: table-row;
-    border-bottom: 1px solid #e0e0e0;
+    display: grid;
+    /* Grid: Label (flexible) | Input (fixed width) | Unit (small fixed) */
+    grid-template-columns: 1fr 120px 50px; 
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--surface-color);
 }
 
 .grid-row:last-child {
@@ -96,90 +174,104 @@ header p {
 }
 
 .grid-cell {
-    display: table-cell;
-    padding: 12px 15px;
-    vertical-align: middle;
-    
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.95rem;
 }
 
+/* Header & Category Rows */
 .header-row {
-    background-color: #165595;
+    background-color: var(--primary-light);
+    color: white;
     font-weight: 600;
-    color: white; /* Added to make text visible on dark background */
-}
-
-
-/* --- FIX: Round the top corners of the blue header --- */
-.header-row .grid-cell:first-child {
-    border-top-left-radius: 5px;
-}
-
-.header-row .grid-cell:last-child {
-    border-top-right-radius: 5px;
+    grid-template-columns: 1fr 120px 50px; /* Keep alignment */
 }
 
 .category-row {
-    background-color: #3498db; 
+    background-color: var(--accent-color);
+    color: white;
     font-weight: 600;
-    color: #ffffff;
+    display: block; /* Full width for category headers */
 }
+
 .category-row .grid-cell {
     text-align: center;
-    padding: 12px 15px; /* Moved padding here for consistency */
-}
-
-.grid-cell input {
     width: 100%;
-    padding: 8px 10px;
-    border: 1px solid #3e9157;
-    border-radius: 4px;
-    font-size: 0.95rem;
-    transition: border-color 0.3s;
-    
 }
 
+/* Inputs styling */
+.grid-cell input, 
+.grid-cell select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    background: var(--input-bg);
+    min-height: 44px; /* Touch target size */
+}
 
-.grid-cell input:focus {
-    border-color: #d5dee4;
+.grid-cell input:focus, 
+.grid-cell select:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(239, 249, 255, 0.2);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 
+/* Readonly Inputs */
+input[readonly] {
+    background-color: #ecf0f1;
+    color: var(--text-secondary);
+    border-color: transparent;
+    cursor: default;
+}
 
-
+/* ==========================================================================
+   6. RESULTS SECTION
+   ========================================================================== */
 .results-container {
-    padding: 20px;
-    max-height: 600px;
-    overflow-y: auto;
-    overflow-x: auto;
+    padding: var(--spacing-lg);
 }
 
-.placeholder-message {
-    text-align: center;
-    color: #7f8c8d;
-    font-style: italic;
-    padding: 40px 0;
+.results-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Mobile First */
+    gap: var(--spacing-lg);
 }
 
+/* Result Groups (Cards) */
 .result-group {
-    border: 1px solid #b13333;
-    border-radius: 6px;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
     overflow: hidden;
+    margin-bottom: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-fast);
+}
+
+.result-group:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .result-group-title {
-    background-color: #f1f8e9;
-    padding: 12px 15px;
+    background-color: #ecf0f1;
+    padding: var(--spacing-sm) var(--spacing-md);
     font-weight: 600;
-    color: #2c3e50;
-    border-bottom: 1px solid #e0e0e0;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--border-color);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .result-row {
     display: flex;
     justify-content: space-between;
-    padding: 10px 15px;
-    border-bottom: 1px solid #f0f0f0;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-bottom: 1px solid #f9f9f9;
 }
 
 .result-row:last-child {
@@ -187,364 +279,265 @@ header p {
 }
 
 .result-label {
-    font-weight: 500;
-    color: #555;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
 }
 
 .result-value {
-    font-weight: 600;
-    color: #2c3e50;
+    font-weight: 700;
+    color: var(--primary-color);
+    font-family: 'Roboto Mono', monospace; /* Monospace for numbers */
 }
 
-.error-message {
-    background-color: #ffebee;
-    color: #c62828;
-    padding: 15px;
-    border-radius: 4px;
-    margin: 10px 0;
-    border-left: 4px solid #c62828;
-}
-
-
-.results-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-}
-
-.results-column {
-    display: flex;
-    flex-direction: column;
-    gap: 25px; /* Matches your old result-group margin-bottom */
-}
-
-/* Make results stack vertically on smaller screens */
-@media (max-width: 1024px) {
-    .results-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-.input-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    padding: 20px; /* This makes it match the results section styling */
-}
-
-/* Make inputs stack vertically on smaller screens */
-@media (max-width: 1024px) {
-    .input-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Add this to style.css to border the input groups */
-
-.input-section .grid-container {
-    border: 1px solid #b13333;
-    border-radius: 6px;
-    overflow: hidden;
-    overflow-x: auto;
-    
-    /* This overrides 'border-collapse: collapse' 
-       so the border-radius is visible */
-    border-collapse: separate; 
-    border-spacing: 0;
-}
-
-
-.send-btn {
-    background-color: #27ae60; /* A green color */
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.3s;
-    margin-left: 25px; /* Space between buttons */
-}
-
-.send-btn:hover {
-    background-color: #219150;
-}
-
-/* Modal styles */
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1000; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%; 
-    height: 100%; 
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); 
-    background-color: rgba(0,0,0,0.4); 
-}
-
-/* Modal content box */
-.modal-content {
-    background-color: #fefefe;
-    margin: 10% auto; /* 10% from the top and centered */
-    padding: 30px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 500px;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    position: relative;
-}
-
-/* The Close Button ('x') */
-.modal-close {
-    color: #aaa;
-    position: absolute;
-    right: 20px;
-    top: 15px;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.modal-close:hover,
-.modal-close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-/* Form styles inside the modal */
-#reportForm label {
-    display: block;
-    margin-top: 15px;
-    font-weight: 500;
-    color: #333;
-}
-
-#reportForm input[type="text"],
-#reportForm input[type="email"],
-#reportForm input[type="tel"] {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box; /* Important */
-    font-size: 0.95rem;
-}
-
-
-
-
-
-
-
-
-
-
-
-#reportForm button {
-    margin-top: 20px;
-    width: 100%;
-    font-size: 1rem;
-    padding: 20px 0;
-    margin: 20px 0;
-
-}
-
-
-
-#formStatus {
-    margin-top: 15px;
-    font-size: 0.9rem;
-    text-align: center;
-}
-
-
-
-
-
-.download-btn {
-    background-color: #504c8f; /* A dark blue/grey */
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.3s;
-    margin-left: 25px; 
-}
-
-.download-btn:hover {
-    background-color: #325679;
-}
-
-/* ADD THIS TO THE END OF style.css */
-
-/* Styles for the new Trace Width Calculator */
-.trace-width-calculator .grid-cell {
-    vertical-align: middle;
-}
-
-.trace-width-calculator .grid-cell select {
-    width: 100%;
-    padding: 8px 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 0.95rem;
-    background-color: #fff;
-}
-
-.trace-width-calculator .grid-container {
-    /* Use the same red border as the motor inputs */
-    border: 1px solid #b13333;
-    border-radius: 6px;
-    overflow: hidden;
-    border-collapse: separate; 
-    border-spacing: 0;
-}
-
-.trace-width-calculator .result-group-title {
-    background-color: #e8f4fd; /* Match other category rows */
-}
-
-/* This is the .result-card class from your JS */
-.tw-result-card {
-    margin-bottom: 25px;
-}
-
-/* This is the .pulse animation from your JS */
-@keyframes pulse-animation {
-    0% {
-        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4);
-    }
-    70% {
-        box-shadow: 0 0 0 10px rgba(52, 152, 219, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);
-    }
-}
-.pulse {
-    animation: pulse-animation 1s;
-}
-
-
-/* --- DASHBOARD STYLES --- */
+/* ==========================================================================
+   7. DASHBOARD CHARTS
+   ========================================================================== */
 .dashboard-grid {
-    padding: 20px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    background-color: #f9f9f9;
+    display: grid;
+    grid-template-columns: 1fr; /* Mobile First */
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    background: #fafafa;
 }
 
 .chart-container {
     background: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    border: 1px solid #eee;
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+    position: relative;
+    /* Chart Aspect Ratio Handling */
+    height: 350px; 
+    width: 100%;
 }
 
 .chart-container h3 {
     text-align: center;
     font-size: 1rem;
-    color: #555;
-    margin-bottom: 10px;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-md);
     font-weight: 600;
 }
 
-/* Full width for the Master Chart */
+/* Master chart specific sizing */
 .full-width {
+    height: 400px;
+}
+
+/* ==========================================================================
+   8. BUTTONS
+   ========================================================================== */
+button, .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    min-height: 44px; /* Mobile touch target */
+    text-decoration: none;
+}
+
+/* Primary Action (Calculate) */
+.calculate-btn {
+    background-color: var(--accent-color);
+    color: white;
+    width: 100%; /* Full width on mobile */
+    margin: var(--spacing-xs) 0;
+}
+.calculate-btn:hover { background-color: var(--accent-hover); box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3); }
+
+/* Secondary Action (3D View) */
+#view3dBtn {
+    background-color: var(--secondary-accent) !important;
     width: 100%;
-    height: 450px; /* Taller for the main chart */
-    /* min-height: 200px; */
+    margin: var(--spacing-xs) 0;
 }
+#view3dBtn:hover { box-shadow: 0 4px 12px rgba(142, 68, 173, 0.3); }
 
+/* Success Action (Send) */
+.send-btn {
+    background-color: var(--success-color);
+    color: white;
+    width: 100%;
+    margin: var(--spacing-xs) 0;
+}
+.send-btn:hover { background-color: var(--success-hover); }
 
+/* Neutral Action (Download) */
+.download-btn {
+    background-color: var(--primary-light);
+    color: white;
+    width: 100%;
+    margin: var(--spacing-xs) 0;
+}
+.download-btn:hover { background-color: var(--primary-color); }
 
-/* Update this class in style.css */
-.half-width {
-    width: calc(50% - 10px);
-    height: 380px; /* Increased from 300px to 380px */
-    min-height: 380px;
+/* Button Container in Header */
+.section-header > div {
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Stack on mobile */
+    width: 100%;
+    gap: var(--spacing-sm);
 }
 
-/* Ensure the canvas fills the space */
-.chart-container canvas {
-    flex-grow: 1;
-    width: 100% !important;
-    height: 100% !important;
+/* ==========================================================================
+   9. MODAL
+   ========================================================================== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    overflow-y: auto;
 }
 
-@media (max-width: 768px) {
-    .half-width {
-        width: 100%;
-        height: 350px; /* Slightly smaller on mobile but still big */
+.modal-content {
+    background-color: var(--surface-color);
+    margin: 10vh auto;
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: var(--shadow-lg);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color var(--transition-fast);
+}
+
+.modal-close:hover { color: var(--danger-color); }
+
+#reportForm label {
+    display: block;
+    margin-top: var(--spacing-md);
+    font-weight: 500;
+    color: var(--primary-color);
+}
+
+#reportForm input {
+    width: 100%;
+    padding: 12px;
+    margin-top: var(--spacing-xs);
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+}
+
+#reportForm button {
+    width: 100%;
+    margin-top: var(--spacing-lg);
+    padding: 15px;
+    font-size: 1.1rem;
+}
+
+/* ==========================================================================
+   10. TRACE WIDTH CALCULATOR SPECIFIC
+   ========================================================================== */
+.tw-result-card {
+    background: white;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--accent-color);
+    padding: var(--spacing-md);
+}
+
+.pulse {
+    animation: pulse-animation 1s;
+}
+
+@keyframes pulse-animation {
+    0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
+}
+
+/* ==========================================================================
+   11. DESKTOP & TABLET RESPONSIVE OVERRIDES
+   ========================================================================== */
+
+/* Tablet and up (>= 768px) */
+@media (min-width: 768px) {
+    /* Input Section: 2 Columns */
+    .input-grid {
+        grid-template-columns: 1fr 1fr;
     }
+    
+    /* Input Rows: Better spacing */
+    .grid-row {
+        grid-template-columns: 1fr 140px 60px;
+    }
+
+    /* Buttons: Row direction */
+    .section-header > div {
+        flex-direction: row;
+        width: auto;
+    }
+    .calculate-btn, .send-btn, .download-btn, #view3dBtn {
+        width: auto;
+        margin: 0 0 0 var(--spacing-sm);
+    }
+    
+    /* Results: 2 Columns */
+    .results-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    /* Dashboard: 2 Charts per row */
+    .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    /* Master Chart takes full row */
+    .chart-container.full-width {
+        grid-column: span 2;
+    }
+    
+    /* Header Logo Positioning */
+    .company-logo {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        margin-bottom: 0;
+    }
+    
+    header h1 { margin-top: 0; }
 }
 
-
-
-/* Responsive adjustments */
-/* The @media query for 1024px is no longer needed since 1fr is now the default */
-@media (max-width: 768px) {
+/* Large Desktop (>= 1200px) */
+@media (min-width: 1200px) {
     .container {
-        padding: 10px;
+        padding: var(--spacing-xl);
     }
     
-    .grid-cell {
-        padding: 8px 10px;
+    .chart-container {
+        height: 400px;
     }
     
-    .section-header {
-        padding: 12px 15px;
+    .full-width {
+        height: 500px;
     }
-    
-    .results-container {
-        padding: 15px;
-    }
-}
-
-
-/* --- LOGO STYLES --- */
-
-.company-logo {
-
-    position: absolute;  /* Logo ko free movement deta hai */
-    top: 0px;           /* Upar se 10px neeche */
-    left: 20px;
-    
-
-
-    height: 100px;  /* Adjusts the size of the logo */
-    width: 100px;   /* Keeps the logo shape correct */
-    object-fit: cover; /* Ensures the image covers the space */
-    border-radius: 50%; /* Makes the logo circular */
-    background-color: #ffffff; /* Adds a white background */
-    /* border: 2px solid #22500c; */
-    margin-bottom: 15px; /* Adds space between logo and text */
-    cursor: pointer; /* Changes mouse cursor to a hand pointer */
-    transition: transform 0.5s ease; /* Smooth movement */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2); /* Adds a subtle shadow */
-}
-
-/* This defines the Spin Animation */
-@keyframes spinOneRound {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* When the cursor touches the logo, run the animation */
-.company-logo:hover {
-    animation: spinOneRound 0.6s ease-in-out;
 }
