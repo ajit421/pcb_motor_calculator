@@ -2,23 +2,31 @@
    1. VARIABLES & RESET
    ========================================================================== */
 :root {
-    /* Color Palette - Professional Engineering Theme */
-    --primary-color: #2c3e50;       /* Dark Navy */
-    --primary-light: #3b5e34;
-    --accent-color: #3498db;        /* Bright Blue */
-    --accent-hover: #b2b929;
-    --secondary-accent: #8e44ad;    /* Purple (3D/Special actions) */
-    --secondary-hover: #b2b929;
+    /* Color Palette - Professional Engineering Theme (LIGHT MODE) */
+    --primary-color: #2c3e50;
+    /* Dark Navy */
+    --primary-light: #34495e;
+    --accent-color: #3498db;
+    /* Bright Blue */
+    --accent-hover: #b4b929;
+    --secondary-accent: #8e44ad;
+    /* Purple */
+    --secondary-hover: #b4b929;
     --success-color: #27ae60;
-    --success-hover: #b2b929;
+    --success-hover: #b4b929;
     --danger-color: #c0392b;
-    --bg-color: #e4e4e4;            /* Light Grey Background */
-    --surface-color: #fefefe;       /* Card Background */
-    --text-primary: #000000;
-    --text-secondary: #000000;
-    --border-color: #dfd5d5;
+
+    /* Backgrounds & Text */
+    --bg-color: #f4f7f6;
+    /* Light Grey Background */
+    --surface-color: #ffffff;
+    /* Card Background */
+    --text-primary: #333333;
+    /* Dark Text */
+    --text-secondary: #8d7f7f;
+    --border-color: #e0e0e0;
     --input-bg: #ffffff;
-    --input-border: #26ae48;
+    --input-border: #bdc3c7;
 
     /* Spacing */
     --spacing-xs: 4px;
@@ -26,23 +34,51 @@
     --spacing-md: 16px;
     --spacing-lg: 24px;
     --spacing-xl: 32px;
-    
+
     /* Shadows */
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-    --shadow-lg: 0 10px 20px rgba(0,0,0,0.15);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15);
 
     /* Radii */
     --radius-sm: 4px;
     --radius-md: 8px;
     --radius-lg: 12px;
-    
+
     /* Transitions */
     --transition-fast: 0.2s ease;
     --transition-normal: 0.3s ease;
 }
 
-*, *::before, *::after {
+/* DARK MODE OVERRIDES */
+[data-theme="dark"] {
+    --primary-color: #3498db;
+    /* Lighter Blue for dark bg */
+    --primary-light: #ecf0f1;
+    --accent-color: #3498db;
+    --accent-hover: #2980b9;
+    --secondary-accent: #9b59b6;
+    --secondary-hover: #8e44ad;
+    --success-color: #2ecc71;
+    --success-hover: #27ae60;
+    --danger-color: #e74c3c;
+
+    /* Backgrounds & Text - FIXED FOR DARK MODE */
+    --bg-color: #121212;
+    /* Dark Grey Background */
+    --surface-color: #1e1e1e;
+    /* Darker Card Background */
+    --text-primary: #e0e0e0;
+    /* Light Text */
+    --text-secondary: #b0b0b0;
+    --border-color: #333333;
+    --input-bg: #2d2d2d;
+    --input-border: #444444;
+}
+
+*,
+*::before,
+*::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -53,9 +89,40 @@ body {
     background-color: var(--bg-color);
     color: var(--text-primary);
     line-height: 1.6;
-    font-size: 16px; /* Base size for readability */
+    font-size: 16px;
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* ==========================================================================
+   THEME TOGGLE BUTTON
+   ========================================================================== */
+.theme-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    border: 2px solid var(--text-primary);
+    color: var(--text-primary);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.theme-btn:hover {
+    background: var(--text-primary);
+    color: var(--surface-color);
+    /* Inverts color on hover */
+}
+
+
+header>h1,
+header>p {
+    margin: 0 auto;
+}
+
 
 /* ==========================================================================
    2. LAYOUT & CONTAINER
@@ -85,11 +152,13 @@ header {
     margin-bottom: var(--spacing-lg);
     position: relative;
     border-bottom: 3px solid var(--accent-color);
+    transition: background-color 0.3s ease;
 }
 
 header h1 {
-    color: var(--primary-color);
-    font-size: clamp(1.5rem, 4vw, 2.2rem); /* Fluid typography */
+    color: var(--text-primary);
+    /* Changed to use variable */
+    font-size: clamp(1.5rem, 4vw, 2.2rem);
     margin-bottom: var(--spacing-xs);
 }
 
@@ -121,11 +190,13 @@ header p {
     overflow: hidden;
     margin-bottom: var(--spacing-lg);
     border: 1px solid var(--border-color);
+    transition: background-color 0.3s ease;
 }
 
 .section-header {
     background: var(--primary-color);
     color: white;
+    /* Always white text on header bar */
     padding: var(--spacing-md) var(--spacing-lg);
     display: flex;
     justify-content: space-between;
@@ -143,15 +214,13 @@ header p {
 /* ==========================================================================
    5. INPUT GRIDS & FORMS
    ========================================================================== */
-/* Layout for the two main columns in Input Section */
 .input-grid {
     display: grid;
-    grid-template-columns: 1fr; /* Mobile First: Stacked */
+    grid-template-columns: 1fr;
     gap: var(--spacing-lg);
     padding: var(--spacing-lg);
 }
 
-/* Table-like Structure using CSS Grid for Inputs */
 .grid-container {
     display: flex;
     flex-direction: column;
@@ -162,11 +231,12 @@ header p {
 
 .grid-row {
     display: grid;
-    /* Grid: Label (flexible) | Input (fixed width) | Unit (small fixed) */
-    grid-template-columns: 1fr 120px 50px; 
+    grid-template-columns: 1fr 120px 50px;
     align-items: center;
     border-bottom: 1px solid var(--border-color);
     background: var(--surface-color);
+    /* Uses variable for Dark Mode */
+    color: var(--text-primary);
 }
 
 .grid-row:last-child {
@@ -178,19 +248,22 @@ header p {
     font-size: 0.95rem;
 }
 
-/* Header & Category Rows */
 .header-row {
     background-color: var(--primary-light);
     color: white;
     font-weight: 600;
-    grid-template-columns: 1fr 120px 50px; /* Keep alignment */
+}
+
+/* Dark mode adjustment for header text if primary-light is light */
+[data-theme="dark"] .header-row {
+    color: #333;
 }
 
 .category-row {
     background-color: var(--accent-color);
     color: white;
     font-weight: 600;
-    display: block; /* Full width for category headers */
+    display: block;
 }
 
 .category-row .grid-cell {
@@ -198,8 +271,7 @@ header p {
     width: 100%;
 }
 
-/* Inputs styling */
-.grid-cell input, 
+.grid-cell input,
 .grid-cell select {
     width: 100%;
     padding: 10px;
@@ -208,19 +280,20 @@ header p {
     font-size: 1rem;
     transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
     background: var(--input-bg);
-    min-height: 44px; /* Touch target size */
+    color: var(--text-primary);
+    min-height: 44px;
 }
 
-.grid-cell input:focus, 
+.grid-cell input:focus,
 .grid-cell select:focus {
     outline: none;
     border-color: var(--accent-color);
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 
-/* Readonly Inputs */
 input[readonly] {
-    background-color: #ecf0f1;
+    background-color: rgba(0, 0, 0, 0.05);
+    /* Works for both modes */
     color: var(--text-secondary);
     border-color: transparent;
     cursor: default;
@@ -235,19 +308,19 @@ input[readonly] {
 
 .results-grid {
     display: grid;
-    grid-template-columns: 1fr; /* Mobile First */
+    grid-template-columns: 1fr;
     gap: var(--spacing-lg);
 }
 
-/* Result Groups (Cards) */
 .result-group {
-    background: white;
+    background: var(--surface-color);
+    /* Changed to variable */
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     overflow: hidden;
     margin-bottom: var(--spacing-md);
     box-shadow: var(--shadow-sm);
-    transition: transform var(--transition-fast);
+    transition: transform var(--transition-fast), background-color 0.3s ease;
 }
 
 .result-group:hover {
@@ -256,10 +329,10 @@ input[readonly] {
 }
 
 .result-group-title {
-    background-color: #ecf0f1;
+    background-color: rgba(0, 0, 0, 0.05);
     padding: var(--spacing-sm) var(--spacing-md);
     font-weight: 600;
-    color: var(--primary-color);
+    color: var(--text-primary);
     border-bottom: 2px solid var(--border-color);
     font-size: 0.9rem;
     text-transform: uppercase;
@@ -271,7 +344,8 @@ input[readonly] {
     justify-content: space-between;
     align-items: center;
     padding: var(--spacing-sm) var(--spacing-md);
-    border-bottom: 1px solid #f9f9f9;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
 }
 
 .result-row:last-child {
@@ -285,8 +359,8 @@ input[readonly] {
 
 .result-value {
     font-weight: 700;
-    color: var(--primary-color);
-    font-family: 'Roboto Mono', monospace; /* Monospace for numbers */
+    color: var(--text-primary);
+    font-family: 'Roboto Mono', monospace;
 }
 
 /* ==========================================================================
@@ -294,21 +368,22 @@ input[readonly] {
    ========================================================================== */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: 1fr; /* Mobile First */
+    grid-template-columns: 1fr;
     gap: var(--spacing-lg);
     padding: var(--spacing-lg);
-    background: #fafafa;
+    background: rgba(0, 0, 0, 0.02);
+    /* Slight tint instead of hardcoded color */
 }
 
 .chart-container {
-    background: white;
+    background: var(--surface-color);
+    /* Changed to variable */
     padding: var(--spacing-md);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--border-color);
     position: relative;
-    /* Chart Aspect Ratio Handling */
-    height: 350px; 
+    height: 350px;
     width: 100%;
 }
 
@@ -320,7 +395,6 @@ input[readonly] {
     font-weight: 600;
 }
 
-/* Master chart specific sizing */
 .full-width {
     height: 400px;
 }
@@ -328,7 +402,8 @@ input[readonly] {
 /* ==========================================================================
    8. BUTTONS
    ========================================================================== */
-button, .btn {
+button,
+.btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -339,49 +414,63 @@ button, .btn {
     font-size: 0.95rem;
     cursor: pointer;
     transition: all var(--transition-fast);
-    min-height: 44px; /* Mobile touch target */
+    min-height: 44px;
     text-decoration: none;
 }
 
-/* Primary Action (Calculate) */
+/* Primary Action */
 .calculate-btn {
     background-color: var(--accent-color);
     color: white;
-    width: 100%; /* Full width on mobile */
+    width: 100%;
     margin: var(--spacing-xs) 0;
 }
-.calculate-btn:hover { background-color: var(--accent-hover); box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3); }
 
-/* Secondary Action (3D View) */
+.calculate-btn:hover {
+    background-color: var(--accent-hover);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+/* Secondary Action */
 #view3dBtn {
     background-color: var(--secondary-accent) !important;
     width: 100%;
     margin: var(--spacing-xs) 0;
+    color: white;
 }
-#view3dBtn:hover { box-shadow: 0 4px 12px rgba(142, 68, 173, 0.3); }
 
-/* Success Action (Send) */
+#view3dBtn:hover {
+    box-shadow: 0 4px 12px rgba(142, 68, 173, 0.3);
+}
+
+/* Success Action */
 .send-btn {
     background-color: var(--success-color);
     color: white;
     width: 100%;
     margin: var(--spacing-xs) 0;
 }
-.send-btn:hover { background-color: var(--success-hover); }
 
-/* Neutral Action (Download) */
+.send-btn:hover {
+    background-color: var(--success-hover);
+}
+
+/* Neutral Action */
 .download-btn {
     background-color: var(--primary-light);
     color: white;
     width: 100%;
     margin: var(--spacing-xs) 0;
 }
-.download-btn:hover { background-color: var(--primary-color); }
 
-/* Button Container in Header */
-.section-header > div {
+.download-btn:hover {
+    opacity: 0.9;
+}
+
+/* Button Container */
+.section-header>div {
     display: flex;
-    flex-direction: column; /* Stack on mobile */
+    flex-direction: column;
     width: 100%;
     gap: var(--spacing-sm);
 }
@@ -397,7 +486,7 @@ button, .btn {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.6);
+    background-color: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(4px);
     overflow-y: auto;
 }
@@ -412,11 +501,19 @@ button, .btn {
     position: relative;
     box-shadow: var(--shadow-lg);
     animation: slideIn 0.3s ease-out;
+    border: 1px solid var(--border-color);
 }
 
 @keyframes slideIn {
-    from { transform: translateY(-20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .modal-close {
@@ -430,13 +527,15 @@ button, .btn {
     transition: color var(--transition-fast);
 }
 
-.modal-close:hover { color: var(--danger-color); }
+.modal-close:hover {
+    color: var(--danger-color);
+}
 
 #reportForm label {
     display: block;
     margin-top: var(--spacing-md);
     font-weight: 500;
-    color: var(--primary-color);
+    color: var(--text-primary);
 }
 
 #reportForm input {
@@ -446,6 +545,8 @@ button, .btn {
     border: 1px solid var(--input-border);
     border-radius: var(--radius-sm);
     font-size: 1rem;
+    background: var(--input-bg);
+    color: var(--text-primary);
 }
 
 #reportForm button {
@@ -456,87 +557,74 @@ button, .btn {
 }
 
 /* ==========================================================================
-   10. TRACE WIDTH CALCULATOR SPECIFIC
+   10. TRACE WIDTH CALCULATOR
    ========================================================================== */
 .tw-result-card {
-    background: white;
+    background: var(--surface-color);
+    /* Changed to variable */
     border-radius: var(--radius-md);
     border: 1px solid var(--accent-color);
     padding: var(--spacing-md);
 }
 
-.pulse {
-    animation: pulse-animation 1s;
-}
-
-@keyframes pulse-animation {
-    0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4); }
-    70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
-}
-
 /* ==========================================================================
-   11. DESKTOP & TABLET RESPONSIVE OVERRIDES
+   11. DESKTOP RESPONSIVE
    ========================================================================== */
-
-/* Tablet and up (>= 768px) */
 @media (min-width: 768px) {
-    /* Input Section: 2 Columns */
     .input-grid {
         grid-template-columns: 1fr 1fr;
     }
-    
-    /* Input Rows: Better spacing */
+
     .grid-row {
         grid-template-columns: 1fr 140px 60px;
     }
 
-    /* Buttons: Row direction */
-    .section-header > div {
+    .section-header>div {
         flex-direction: row;
         width: auto;
     }
-    .calculate-btn, .send-btn, .download-btn, #view3dBtn {
+
+    .calculate-btn,
+    .send-btn,
+    .download-btn,
+    #view3dBtn {
         width: auto;
         margin: 0 0 0 var(--spacing-sm);
     }
-    
-    /* Results: 2 Columns */
+
     .results-grid {
         grid-template-columns: 1fr 1fr;
     }
-    
-    /* Dashboard: 2 Charts per row */
+
     .dashboard-grid {
         grid-template-columns: 1fr 1fr;
     }
-    
-    /* Master Chart takes full row */
+
     .chart-container.full-width {
         grid-column: span 2;
     }
-    
-    /* Header Logo Positioning */
+
     .company-logo {
         position: absolute;
         top: 20px;
         left: 20px;
         margin-bottom: 0;
     }
-    
-    header h1 { margin-top: 0; }
+
+    header h1 {
+        margin-top: 0;
+    }
 }
 
-/* Large Desktop (>= 1200px) */
 @media (min-width: 1200px) {
     .container {
         padding: var(--spacing-xl);
     }
-    
+
     .chart-container {
         height: 400px;
     }
-    
+
     .full-width {
         height: 500px;
     }

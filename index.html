@@ -15,6 +15,9 @@
             <img src="image.png" alt="CompanyLogo" class="company-logo">
             <h1>Airbuddy Motor Calculator</h1>
             <p>Calculate motor parameters for PCB-based designs</p>
+            <button id="themeToggle" class="theme-btn" aria-label="Toggle Dark/Light Mode">
+                <span class="icon">🌙</span> Dark Mode
+            </button>
         </header>
 
         <div class="calculator-grid">
@@ -305,7 +308,7 @@
                     <h2>Calculation Results</h2>
                     <div>
                         <button id="calculateBtn" class="calculate-btn">Calculate</button>
-                        <button id="view3dBtn" class="calculate-btn" style="background-color: #8e44ad;">3D View</button>
+                        <button id="view3dBtn" class="calculate-btn" >3D View</button>
                         <button id="sendRequestBtn" class="send-btn">Send Request</button>
                         <button id="downloadReportBtn" class="download-btn">Download Report</button>
                     </div>
@@ -348,6 +351,7 @@
     <script src="main.js"></script>
     <script src="dashboard.js"></script>
     <script src="PDF_Generation.js"></script>
+    <script src="config.js"></script>
     <script src="send_report.js"></script>
 
 </body>

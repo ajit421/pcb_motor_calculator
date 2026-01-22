@@ -4,7 +4,8 @@
 function doPost(e) {
   
   // --- ⬇️ SET YOUR ADMIN EMAIL HERE ⬇️ ---
-  const NOTIFICATION_EMAIL = "ajit.info999@gmail.com"; 
+  const scriptProperties = PropertiesService.getScriptProperties();
+  const NOTIFICATION_EMAIL = scriptProperties.getProperty('ADMIN_EMAIL'); 
   // --- ⬆️ SET YOUR ADMIN EMAIL HERE ⬆️ ---
 
   try {

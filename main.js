@@ -1408,3 +1408,69 @@ function getTraceResults() {
     return { error: "Could not read trace results" };
   }
 }
+
+
+// ===================================================================
+// DARK MODE LOGIC
+// ===================================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('themeToggle');
+    const htmlElement = document.documentElement;
+    
+    // 1. Check if user already has a preference saved
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme) {
+        htmlElement.setAttribute('data-theme', currentTheme);
+        updateButtonText(currentTheme);
+        updateChartColors(currentTheme);
+    }
+
+    // 2. Handle Button Click
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function() {
+            // Check current setting
+            let theme = htmlElement.getAttribute('data-theme');
+            
+            if (theme === 'dark') {
+                theme = 'light';
+            } else {
+                theme = 'dark';
+            }
+            
+            // Apply new setting
+            htmlElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme); // Save to memory
+            
+            updateButtonText(theme);
+            updateChartColors(theme);
+        });
+    }
+    
+    function updateButtonText(theme) {
+        if (theme === 'dark') {
+            toggleBtn.textContent = '☀️ Day Mode';
+        } else {
+            toggleBtn.textContent = '🌙 Dark Mode';
+        }
+    }
+    
+    // 3. Fix Charts for Dark Mode
+    // (Charts need to redraw to see the new text colors)
+    function updateChartColors(theme) {
+        const textColor = theme === 'dark' ? '#e0e0e0' : '#333333';
+        const gridColor = theme === 'dark' ? '#333333' : '#e0e0e0';
+        
+        // Update Chart.js global defaults if available
+        if (window.Chart) {
+            Chart.defaults.color = textColor;
+            Chart.defaults.borderColor = gridColor;
+            
+            // Re-render charts if they exist
+            if (typeof calculateMotorParameters === 'function') {
+                // This forces the charts to redraw with new colors
+                calculateMotorParameters(true); 
+            }
+        }
+    }
+});

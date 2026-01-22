@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ❗ IMPORTANT: REPLACE THIS URL
     // Get this from Google Apps Script after you Deploy
     // -------------------------------------------------------------------------
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxkijW3gMsDI3Ja8w6qKF2AyU5WLXChoabbk1rRJk89UCZ6KyixpdJ5JISFY8MxKcbowA/exec';
+    const GOOGLE_SCRIPT_URL = CONFIG.GOOGLE_SCRIPT_URL;
     
     // Get all the modal elements
     const modal = document.getElementById('reportModal');
