@@ -1,6 +1,6 @@
 /**
  * 3D Visualization Logic for PCB Motor Calculator
- * FIXED: Magnet Collision, Duplicate Geometries, Rotor Alignment
+ * UPDATED: Added Mobile Drawer Logic & Responsive Resize
  */
 
 // Global Variables
@@ -21,7 +21,6 @@ let motorData = {
     traceGap: 0.5
 };
 
-// Magnet Thickness (Constant for now, or could be an input)
 const MAGNET_HEIGHT = 2.0;
 
 // ==========================================
@@ -31,8 +30,8 @@ const MAGNET_HEIGHT = 2.0;
 function init() {
     // 1. Scene Setup
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a1a1a); // Dark professional background
-    scene.fog = new THREE.Fog(0x1a1a1a, 50, 500);
+    scene.background = new THREE.Color(0x0f1012); // Matched CSS var(--bg-dark)
+    scene.fog = new THREE.Fog(0x0f1012, 50, 600);
 
     // 2. Camera
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
@@ -41,71 +40,83 @@ function init() {
     // 3. Renderer
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     const container = document.getElementById('canvas-container');
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    
+    // Initial Size Calculation
+    updateRendererSize();
+    
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Cap pixel ratio for mobile performance
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     container.appendChild(renderer.domElement);
 
     // 4. Controls
     controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = false; // Disable inertia as requested
+    controls.enableDamping = true; 
     controls.dampingFactor = 0.05;
     controls.minDistance = 10;
     controls.maxDistance = 500;
+    controls.target.set(0, 0, 0);
 
-    // 5. Lighting
+    // 5. Setup
     setupLights();
-
-    // 6. Helpers
     setupHelpers();
-
-    // 7. Group Initialization
+    
+    // Groups
     statorGroup = new THREE.Group();
     coilGroup = new THREE.Group();
     rotorSystem = new THREE.Group();
-
     scene.add(statorGroup);
     scene.add(coilGroup);
     scene.add(rotorSystem);
 
-    // 8. Load Data & Build
+    // 6. Build
     loadDataFromStorage();
     buildModel();
 
-    // 9. Events
+    // 7. Listeners
     window.addEventListener('resize', onWindowResize, false);
     setupUIListeners();
+    setupMobileInterface(); // New Mobile Logic
 
-    // 10. Start Loop
+    // 8. Start Loop
     animate();
 }
 
+/**
+ * Handles Canvas Sizing Logic considering Desktop Sidebar
+ */
+function updateRendererSize() {
+    const container = document.getElementById('canvas-container');
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    renderer.setSize(width, height);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+}
+
 function setupLights() {
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
     dirLight.position.set(50, 100, 50);
     dirLight.castShadow = true;
-    dirLight.shadow.mapSize.width = 2048;
-    dirLight.shadow.mapSize.height = 2048;
+    // Optimize shadow map for mobile
+    dirLight.shadow.mapSize.width = 1024;
+    dirLight.shadow.mapSize.height = 1024;
     scene.add(dirLight);
 
-    // Blue Rim light for metallic definitions
-    const backLight = new THREE.DirectionalLight(0x4455ff, 0.5);
+    const backLight = new THREE.DirectionalLight(0x6c5ce7, 0.5); // Primary color tint
     backLight.position.set(-50, -20, -50);
     scene.add(backLight);
 }
 
 function setupHelpers() {
     helperGroup = new THREE.Group();
-    const gridHelper = new THREE.GridHelper(300, 30, 0x444444, 0x222222);
+    const gridHelper = new THREE.GridHelper(300, 30, 0x333333, 0x1a1a1a);
     helperGroup.add(gridHelper);
-
     const axesHelper = new THREE.AxesHelper(30);
     helperGroup.add(axesHelper);
-
     scene.add(helperGroup);
 }
 
@@ -114,12 +125,11 @@ function setupHelpers() {
 // ==========================================
 
 function buildModel() {
-    // 1. CLEANUP (Recursively removes old meshes to fix ghosts)
+    // Cleanup
     clearGroup(statorGroup);
     clearGroup(coilGroup);
     clearGroup(rotorSystem);
 
-    // 2. Validation
     if (motorData.pcbStatorID >= motorData.pcbStatorOD) {
         showError("Error: Stator ID must be less than OD");
         return;
@@ -133,13 +143,10 @@ function buildModel() {
         hideError();
     } catch (e) {
         console.error("Build Failed:", e);
-        showError("Rendering Error: " + e.message);
+        showError("Build Error: " + e.message);
     }
 }
 
-/**
- * Builds FR4 PCB Layers
- */
 function buildStator() {
     const { pcbStatorOD, pcbStatorID, pcbBoardThickness, numPCBLayers } = motorData;
     const explodeVal = parseFloat(document.getElementById('explodeSlider').value) || 0;
@@ -155,27 +162,25 @@ function buildStator() {
 
     const geometry = new THREE.ExtrudeGeometry(shape, {
         depth: pcbBoardThickness,
-        curveSegments: 64,
+        curveSegments: 48, // Reduced for mobile perf
         bevelEnabled: true,
         bevelThickness: 0.05,
         bevelSize: 0.05,
         bevelSegments: 1
     });
 
-    // Center pivot vertically and rotate flat
     geometry.translate(0, 0, -pcbBoardThickness / 2);
     geometry.rotateX(Math.PI / 2);
 
     const material = new THREE.MeshPhysicalMaterial({
-        color: 0x2e8b57, // PCB Green
+        color: 0x27ae60, // Tech Green
         transparent: true,
-        opacity: 0.9,
+        opacity: 0.85,
         roughness: 0.3,
         metalness: 0.1,
         side: THREE.DoubleSide
     });
 
-    // Calculate start Y to center the stack (accounting for explode gaps)
     const stackHeight = (numPCBLayers * pcbBoardThickness) + ((numPCBLayers > 1 ? numPCBLayers - 1 : 0) * explodeVal);
     const startY = -(stackHeight / 2) + (pcbBoardThickness / 2);
 
@@ -186,7 +191,6 @@ function buildStator() {
 
         const dummy = new THREE.Object3D();
         for (let i = 0; i < numPCBLayers; i++) {
-            // Apply explode offset
             const yPos = startY + (i * pcbBoardThickness) + (i * explodeVal);
             dummy.position.set(0, yPos, 0);
             dummy.updateMatrix();
@@ -197,9 +201,6 @@ function buildStator() {
     }
 }
 
-/**
- * Builds Copper Traces
- */
 function buildTraces() {
     const { pcbStatorOD, pcbStatorID, traceWidthID, traceGap, numPCBLayers } = motorData;
     const explodeVal = parseFloat(document.getElementById('explodeSlider').value) || 0;
@@ -210,91 +211,68 @@ function buildTraces() {
     const pitch = traceWidthID + traceGap;
     let numLines = Math.floor(circumference / pitch);
 
-    // Safety cap
     if (numLines > 180) numLines = 180;
     if (numLines < 1) numLines = 1;
 
-    // Simplified Trace Geometry (Box)
     const traceLen = outerRadius - innerRadius;
-    const geometry = new THREE.BoxGeometry(traceLen, 0.04, traceWidthID); // Thin copper
+    const geometry = new THREE.BoxGeometry(traceLen, 0.04, traceWidthID); 
     geometry.translate((innerRadius + traceLen / 2), 0, 0);
 
     const material = new THREE.MeshStandardMaterial({
-        color: 0xb87333, // Copper
-        roughness: 0.4,
-        metalness: 1.0
+        color: 0xe17055, // Copper
+        roughness: 0.3,
+        metalness: 0.9
     });
 
     const totalInstances = numLines * numPCBLayers;
     const mesh = new THREE.InstancedMesh(geometry, material, totalInstances);
 
     const dummy = new THREE.Object3D();
-    // Calculate start Y to center the stack (accounting for explode gaps)
     const stackHeight = (numPCBLayers * motorData.pcbBoardThickness) + ((numPCBLayers > 1 ? numPCBLayers - 1 : 0) * explodeVal);
     const startY = -(stackHeight / 2) + (motorData.pcbBoardThickness / 2);
 
     let index = 0;
     for (let layer = 0; layer < numPCBLayers; layer++) {
-        // Place slightly above PCB surface (0.03 offset)
         const yPos = startY + (layer * motorData.pcbBoardThickness) + (layer * explodeVal) + (motorData.pcbBoardThickness / 2) + 0.03;
-
         for (let line = 0; line < numLines; line++) {
             const angle = (line / numLines) * Math.PI * 2;
-
             dummy.position.set(0, yPos, 0);
             dummy.rotation.set(0, angle, 0);
             dummy.updateMatrix();
             mesh.setMatrixAt(index++, dummy.matrix);
         }
     }
-
     mesh.instanceMatrix.needsUpdate = true;
     coilGroup.add(mesh);
 }
 
-/**
- * Builds Rotor System (Top and Bottom)
- * Handles correct gap spacing and rotation.
- */
 function buildRotorSystem() {
     const { pcbStatorOD, pcbStatorID, pmRotorHeight, airGap, numPCBLayers, pcbBoardThickness } = motorData;
     const explodeVal = parseFloat(document.getElementById('explodeSlider').value) || 0;
 
-    // 1. Calculate Stator Height (Visual height including explode gaps)
     const statorStackHeight = (numPCBLayers * pcbBoardThickness) + ((numPCBLayers > 1 ? numPCBLayers - 1 : 0) * explodeVal);
-
-    // 2. Calculate Rotor Center Position
-    // We want the MAGNET SURFACE to be at (statorHeight/2 + airGap).
-    // The Rotor Assembly Origin is at the interface between Magnet and Iron.
-    // Magnets hang DOWN (-MAGNET_HEIGHT) from origin. Iron goes UP (+pmRotorHeight) from origin.
-    // So, Origin Y = (statorHeight/2) + airGap + MAGNET_HEIGHT.
     const yOffset = (statorStackHeight / 2) + airGap + MAGNET_HEIGHT;
 
-    // --- Template Group for One Rotor ---
     const rotorTemplate = new THREE.Group();
 
-    // Back Iron (Cylinder)
+    // Iron Back plate
     const rOuter = (pcbStatorOD / 2) + 1;
     const ironGeo = new THREE.CylinderGeometry(rOuter, rOuter, pmRotorHeight, 64);
-    // Move up so bottom face is at Y=0
     ironGeo.translate(0, pmRotorHeight / 2, 0);
+    const ironMat = new THREE.MeshStandardMaterial({ color: 0x2d3436, metalness: 0.8, roughness: 0.2 });
+    rotorTemplate.add(new THREE.Mesh(ironGeo, ironMat));
 
-    const ironMat = new THREE.MeshStandardMaterial({ color: 0x222222, metalness: 0.8, roughness: 0.2 });
-    const ironMesh = new THREE.Mesh(ironGeo, ironMat);
-    rotorTemplate.add(ironMesh);
-
-    // Magnets (Boxes)
+    // Magnets
     const numPoles = 14;
     const magLen = (pcbStatorOD - pcbStatorID) / 2;
     const avgRadius = (pcbStatorOD + pcbStatorID) / 4;
-    const magW = (2 * Math.PI * avgRadius) / numPoles * 0.7; // 70% fill factor
+    const magW = (2 * Math.PI * avgRadius) / numPoles * 0.7;
 
     const magGeo = new THREE.BoxGeometry(magLen, MAGNET_HEIGHT, magW);
-    // Move down so top face is at Y=0, and move out to radius
     magGeo.translate((pcbStatorID / 2) + (magLen / 2), -MAGNET_HEIGHT / 2, 0);
 
-    const matN = new THREE.MeshStandardMaterial({ color: 0xc0392b, metalness: 0.3, roughness: 0.2 }); // Red
-    const matS = new THREE.MeshStandardMaterial({ color: 0x2980b9, metalness: 0.3, roughness: 0.2 }); // Blue
+    const matN = new THREE.MeshStandardMaterial({ color: 0xd63031, metalness: 0.3, roughness: 0.2 }); // Red
+    const matS = new THREE.MeshStandardMaterial({ color: 0x0984e3, metalness: 0.3, roughness: 0.2 }); // Blue
 
     for (let i = 0; i < numPoles; i++) {
         const angle = (i / numPoles) * Math.PI * 2;
@@ -303,43 +281,28 @@ function buildRotorSystem() {
         rotorTemplate.add(mag);
     }
 
-    // --- Top Rotor ---
     const topRotor = rotorTemplate.clone();
     topRotor.position.y = yOffset;
     rotorSystem.add(topRotor);
 
-    // --- Bottom Rotor ---
     const botRotor = rotorTemplate.clone();
-    // Rotate 180 deg around X so magnets face UP
     botRotor.rotation.x = Math.PI;
-    // Position symmetric to top
     botRotor.position.y = -yOffset;
-
     rotorSystem.add(botRotor);
 }
 
 // ==========================================
-// 3. UTILITIES
+// 3. UTILITIES & EVENTS
 // ==========================================
 
 function clearGroup(group) {
-    // Traverse backwards to safely remove children
     while (group.children.length > 0) {
         const child = group.children[0];
-
-        // Recursive clear for complex objects
-        if (child.children.length > 0) {
-            clearGroup(child);
-        }
-
+        if (child.children.length > 0) clearGroup(child);
         if (child.geometry) child.geometry.dispose();
-
         if (child.material) {
-            if (Array.isArray(child.material)) {
-                child.material.forEach(m => m.dispose());
-            } else {
-                child.material.dispose();
-            }
+            if (Array.isArray(child.material)) child.material.forEach(m => m.dispose());
+            else child.material.dispose();
         }
         group.remove(child);
     }
@@ -348,7 +311,7 @@ function clearGroup(group) {
 function updateStats() {
     const triangles = renderer.info.render.triangles;
     const el = document.getElementById('poly-counter');
-    if (el) el.innerText = `Triangles: ${triangles.toLocaleString()}`;
+    if (el) el.innerText = `Tris: ${triangles.toLocaleString()}`;
 }
 
 function loadDataFromStorage() {
@@ -378,6 +341,8 @@ function showError(msg) {
     if (el) {
         el.innerText = msg;
         el.style.display = 'block';
+        // Auto dismiss after 5s
+        setTimeout(() => { el.style.display = 'none'; }, 5000);
     }
 }
 
@@ -387,32 +352,79 @@ function hideError() {
 }
 
 function onWindowResize() {
-    const container = document.getElementById('canvas-container');
-    camera.aspect = container.clientWidth / container.clientHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(container.clientWidth, container.clientHeight);
+    updateRendererSize();
+}
+
+/**
+ * New Mobile Drawer & Logic
+ */
+function setupMobileInterface() {
+    const toggleBtn = document.getElementById('mobile-toggle-btn');
+    const panel = document.getElementById('controls-panel');
+    const backdrop = document.getElementById('drawer-backdrop');
+    
+    // Toggle Function
+    function toggleDrawer() {
+        const isOpen = panel.classList.contains('open');
+        if (isOpen) {
+            panel.classList.remove('open');
+            backdrop.classList.remove('active');
+        } else {
+            panel.classList.add('open');
+            backdrop.classList.add('active');
+        }
+    }
+
+    // Event Listeners
+    if(toggleBtn) toggleBtn.addEventListener('click', toggleDrawer);
+    if(backdrop) backdrop.addEventListener('click', toggleDrawer);
+    
+    // Close on Drag Down (Basic Swipe)
+    let startY;
+    const handle = document.querySelector('.drawer-handle');
+    
+    if(handle && panel) {
+        handle.addEventListener('touchstart', e => { startY = e.touches[0].clientY; });
+        handle.addEventListener('touchmove', e => {
+            const currentY = e.touches[0].clientY;
+            if (currentY - startY > 50) { // Dragged down
+                toggleDrawer(); 
+            }
+        });
+    }
 }
 
 function setupUIListeners() {
-    const syncBtn = document.getElementById('syncBtn');
-    if (syncBtn) syncBtn.addEventListener('click', () => {
+    document.getElementById('syncBtn').addEventListener('click', () => {
         loadDataFromStorage();
         buildModel();
     });
 
+    // Debounced Input Handler
+    let timeout;
     document.querySelectorAll('#controls-panel input[type="number"]').forEach(input => {
         input.addEventListener('input', (e) => {
             const key = e.target.id.replace('v_', '');
             const val = parseFloat(e.target.value);
-            if (!isNaN(val)) {
-                motorData[key] = val;
-                buildModel();
-            }
+            
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                if (!isNaN(val)) {
+                    motorData[key] = val;
+                    buildModel();
+                }
+            }, 100);
         });
     });
 
     const slider = document.getElementById('explodeSlider');
-    if (slider) slider.addEventListener('input', buildModel);
+    const sliderVal = document.getElementById('explodeValDisplay');
+    if (slider) {
+        slider.addEventListener('input', (e) => {
+            if(sliderVal) sliderVal.innerText = e.target.value + "mm";
+            buildModel();
+        });
+    }
 
     const toggle = (id, obj) => {
         const el = document.getElementById(id);
@@ -424,8 +436,7 @@ function setupUIListeners() {
     toggle('showRotor', rotorSystem);
     toggle('showAxes', helperGroup);
 
-    const animCheck = document.getElementById('animateRotor');
-    if (animCheck) animCheck.addEventListener('change', e => isAnimating = e.target.checked);
+    document.getElementById('animateRotor').addEventListener('change', e => isAnimating = e.target.checked);
 
     document.getElementById('resetViewBtn').addEventListener('click', () => {
         controls.reset();
@@ -445,11 +456,9 @@ function setupUIListeners() {
 
 function animate() {
     requestAnimationFrame(animate);
-
-    if (isAnimating) {
+    if (isAnimating && rotorSystem) {
         rotorSystem.rotation.y += 2 * clock.getDelta();
     }
-
     controls.update();
     renderer.render(scene, camera);
 }

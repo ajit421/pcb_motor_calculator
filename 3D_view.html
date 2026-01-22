@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>3D Motor Visualization</title>
     <link rel="stylesheet" href="3D_view.css">
     
@@ -13,53 +13,83 @@
 <body>
     <div id="canvas-container"></div>
 
+    <div class="stats-box">
+        <span id="poly-counter">Triangles: 0</span>
+    </div>
+
+    <button id="mobile-toggle-btn" aria-label="Open Controls">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" y1="21" x2="4" y2="14"></line>
+            <line x1="4" y1="10" x2="4" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12" y2="3"></line>
+            <line x1="20" y1="21" x2="20" y2="16"></line>
+            <line x1="20" y1="12" x2="20" y2="3"></line>
+            <line x1="1" y1="14" x2="7" y2="14"></line>
+            <line x1="9" y1="8" x2="15" y2="8"></line>
+            <line x1="17" y1="16" x2="23" y2="16"></line>
+        </svg>
+    </button>
+
+    <div id="drawer-backdrop"></div>
+
     <div id="controls-panel">
+        <div class="drawer-handle"></div>
+
         <div class="panel-header">
             <h2>3D Motor View</h2>
-            <button id="syncBtn" class="btn primary">Sync</button>
-        </div>
-
-        <div class="stats-box">
-            <span id="poly-counter">Triangles: 0</span>
+            <button id="syncBtn" class="btn primary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 4v6h-6"></path>
+                    <path d="M1 20v-6h6"></path>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+                Sync Data
+            </button>
         </div>
 
         <div class="control-group">
             <h3>Visualization</h3>
             <label class="toggle-row">
-                <input type="checkbox" id="showStator" checked> PCB Stator
+                <span class="toggle-text">PCB Stator</span>
+                <input type="checkbox" id="showStator" checked>
             </label>
             <label class="toggle-row">
-                <input type="checkbox" id="showTraces" checked> Copper Traces
+                <span class="toggle-text">Copper Traces</span>
+                <input type="checkbox" id="showTraces" checked>
             </label>
             <label class="toggle-row">
-                <input type="checkbox" id="showRotor" checked> Rotor & Magnets
+                <span class="toggle-text">Rotor & Magnets</span>
+                <input type="checkbox" id="showRotor" checked>
             </label>
             <label class="toggle-row">
-                <input type="checkbox" id="showAxes" checked> Grid & Axis
+                <span class="toggle-text">Grid & Axis</span>
+                <input type="checkbox" id="showAxes" checked>
             </label>
             <label class="toggle-row">
-                <input type="checkbox" id="animateRotor"> Animate Rotation
+                <span class="toggle-text">Animate Rotation</span>
+                <input type="checkbox" id="animateRotor">
             </label>
             
-            <label class="control-label" style="margin-top:10px">Exploded View (Spread)</label>
+            <label style="margin-top:15px; display:flex; justify-content:space-between;">
+                Exploded View 
+                <span style="color:var(--accent-color)" id="explodeValDisplay">0mm</span>
+            </label>
             <input type="range" id="explodeSlider" min="0" max="20" step="0.5" value="0">
         </div>
 
         <div class="control-group">
-            <h3>Parameters (mm)</h3>
+            <h3>Dimensions (mm)</h3>
             
-            <label>Stator OD</label>
+            <label>Stator Outer Diameter</label>
             <input type="number" id="v_pcbStatorOD" step="0.1">
 
-            <label>Stator ID</label>
+            <label>Stator Inner Diameter</label>
             <input type="number" id="v_pcbStatorID" step="0.1">
 
             <label>PCB Thickness</label>
             <input type="number" id="v_pcbBoardThickness" step="0.1">
-
-            <label>Layer Count</label>
-            <input type="number" id="v_numPCBLayers" step="1">
-
+            
             <label>Rotor Height</label>
             <input type="number" id="v_pmRotorHeight" step="0.1">
 
@@ -70,9 +100,15 @@
             <input type="number" id="v_traceWidthID" step="0.01">
         </div>
 
+        <div class="control-group">
+            <h3>Layer Config</h3>
+            <label>Total Layers</label>
+            <input type="number" id="v_numPCBLayers" step="1">
+        </div>
+
         <div class="action-buttons">
-            <button id="resetViewBtn" class="btn secondary">Reset Camera</button>
-            <button id="exportObjBtn" class="btn secondary">Export .OBJ</button>
+            <button id="resetViewBtn" class="btn secondary">Reset Cam</button>
+            <button id="exportObjBtn" class="btn secondary">Export OBJ</button>
         </div>
         
         <div id="error-msg" class="error-toast" style="display:none;"></div>
