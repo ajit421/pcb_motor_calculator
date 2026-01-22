@@ -1,0 +1,588 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    position: relative;
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+header h1 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+header p {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+}
+
+.calculator-grid {
+    display: grid;
+    /* This is the change: from '1fr 1fr' to '1fr' to stack them vertically */
+    grid-template-columns: 1fr;
+    gap: 30px;
+}
+
+.section {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.section-header {
+    background-color: #2c89cc;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.section-header h2 {
+    font-size: 1.3rem;
+    font-weight: 500;
+}
+
+.calculate-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s;
+    margin-left: 25px;
+}
+
+.calculate-btn:hover {
+    background-color: #2980b9;
+}
+
+.grid-container {
+    display: table;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.grid-row {
+    display: table-row;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.grid-row:last-child {
+    border-bottom: none;
+}
+
+.grid-cell {
+    display: table-cell;
+    padding: 12px 15px;
+    vertical-align: middle;
+
+}
+
+.header-row {
+    background-color: #165595;
+    font-weight: 600;
+    color: white;
+    /* Added to make text visible on dark background */
+}
+
+
+/* --- FIX: Round the top corners of the blue header --- */
+.header-row .grid-cell:first-child {
+    border-top-left-radius: 5px;
+}
+
+.header-row .grid-cell:last-child {
+    border-top-right-radius: 5px;
+}
+
+.category-row {
+    background-color: #3498db;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.category-row .grid-cell {
+    text-align: center;
+    padding: 12px 15px;
+    /* Moved padding here for consistency */
+}
+
+.grid-cell input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #3e9157;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    transition: border-color 0.3s;
+
+}
+
+
+.grid-cell input:focus {
+    border-color: #d5dee4;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(239, 249, 255, 0.2);
+}
+
+
+
+.results-container {
+    padding: 20px;
+    max-height: 600px;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+.placeholder-message {
+    text-align: center;
+    color: #7f8c8d;
+    font-style: italic;
+    padding: 40px 0;
+}
+
+.result-group {
+    border: 1px solid #b13333;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.result-group-title {
+    background-color: #f1f8e9;
+    padding: 12px 15px;
+    font-weight: 600;
+    color: #2c3e50;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.result-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.result-row:last-child {
+    border-bottom: none;
+}
+
+.result-label {
+    font-weight: 500;
+    color: #555;
+}
+
+.result-value {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 15px;
+    border-radius: 4px;
+    margin: 10px 0;
+    border-left: 4px solid #c62828;
+}
+
+
+.results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.results-column {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    /* Matches your old result-group margin-bottom */
+}
+
+/* Make results stack vertically on smaller screens */
+@media (max-width: 1024px) {
+    .results-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    padding: 20px;
+    /* This makes it match the results section styling */
+}
+
+/* Make inputs stack vertically on smaller screens */
+@media (max-width: 1024px) {
+    .input-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Add this to style.css to border the input groups */
+
+.input-section .grid-container {
+    border: 1px solid #b13333;
+    border-radius: 6px;
+    overflow: hidden;
+    overflow-x: auto;
+
+    /* This overrides 'border-collapse: collapse' 
+       so the border-radius is visible */
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+
+.send-btn {
+    background-color: #27ae60;
+    /* A green color */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s;
+    margin-left: 25px;
+    /* Space between buttons */
+}
+
+.send-btn:hover {
+    background-color: #219150;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
+    z-index: 1000;
+    /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    /* Enable scroll if needed */
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Modal content box */
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto;
+    /* 10% from the top and centered */
+    padding: 30px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+/* The Close Button ('x') */
+.modal-close {
+    color: #aaa;
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Form styles inside the modal */
+#reportForm label {
+    display: block;
+    margin-top: 15px;
+    font-weight: 500;
+    color: #333;
+}
+
+#reportForm input[type="text"],
+#reportForm input[type="email"],
+#reportForm input[type="tel"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    /* Important */
+    font-size: 0.95rem;
+}
+
+
+
+
+
+
+
+
+
+
+
+#reportForm button {
+    margin-top: 20px;
+    width: 100%;
+    font-size: 1rem;
+    padding: 20px 0;
+    margin: 20px 0;
+
+}
+
+
+
+#formStatus {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+
+
+
+
+.download-btn {
+    background-color: #504c8f;
+    /* A dark blue/grey */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s;
+    margin-left: 25px;
+}
+
+.download-btn:hover {
+    background-color: #325679;
+}
+
+/* ADD THIS TO THE END OF style.css */
+
+/* Styles for the new Trace Width Calculator */
+.trace-width-calculator .grid-cell {
+    vertical-align: middle;
+}
+
+.trace-width-calculator .grid-cell select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    background-color: #fff;
+}
+
+.trace-width-calculator .grid-container {
+    /* Use the same red border as the motor inputs */
+    border: 1px solid #b13333;
+    border-radius: 6px;
+    overflow: hidden;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.trace-width-calculator .result-group-title {
+    background-color: #e8f4fd;
+    /* Match other category rows */
+}
+
+/* This is the .result-card class from your JS */
+.tw-result-card {
+    margin-bottom: 25px;
+}
+
+/* This is the .pulse animation from your JS */
+@keyframes pulse-animation {
+    0% {
+        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(52, 152, 219, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);
+    }
+}
+
+.pulse {
+    animation: pulse-animation 1s;
+}
+
+
+/* --- DASHBOARD STYLES --- */
+.dashboard-grid {
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    background-color: #f9f9f9;
+}
+
+.chart-container {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eee;
+}
+
+.chart-container h3 {
+    text-align: center;
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+/* Full width for the Master Chart */
+.full-width {
+    width: 100%;
+    height: 450px;
+    /* Taller for the main chart */
+    /* min-height: 200px; */
+}
+
+
+
+/* Update this class in style.css */
+.half-width {
+    width: calc(50% - 10px);
+    height: 380px;
+    /* Increased from 300px to 380px */
+    min-height: 380px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ensure the canvas fills the space */
+.chart-container canvas {
+    flex-grow: 1;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+@media (max-width: 768px) {
+    .half-width {
+        width: 100%;
+        height: 350px;
+        /* Slightly smaller on mobile but still big */
+    }
+}
+
+
+
+/* Responsive adjustments */
+/* The @media query for 1024px is no longer needed since 1fr is now the default */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .grid-cell {
+        padding: 8px 10px;
+    }
+
+    .section-header {
+        padding: 12px 15px;
+    }
+
+    .results-container {
+        padding: 15px;
+    }
+}
+
+
+/* --- LOGO STYLES --- */
+
+.company-logo {
+
+    position: absolute;
+    /* Logo ko free movement deta hai */
+    top: 0px;
+    /* Upar se 10px neeche */
+    left: 20px;
+
+
+
+    height: 100px;
+    /* Adjusts the size of the logo */
+    width: 100px;
+    /* Keeps the logo shape correct */
+    object-fit: cover;
+    /* Ensures the image covers the space */
+    border-radius: 50%;
+    /* Makes the logo circular */
+    background-color: #ffffff;
+    /* Adds a white background */
+    /* border: 2px solid #22500c; */
+    margin-bottom: 15px;
+    /* Adds space between logo and text */
+    cursor: pointer;
+    /* Changes mouse cursor to a hand pointer */
+    transition: transform 0.5s ease;
+    /* Smooth movement */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    /* Adds a subtle shadow */
+}
+
+/* This defines the Spin Animation */
+@keyframes spinOneRound {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* When the cursor touches the logo, run the animation */
+.company-logo:hover {
+    animation: spinOneRound 0.6s ease-in-out;
+}
+
+
+/* "write a prompt to improve a 3D view" give me good looking of my website ( for mobile , laptop view ) 
+
+input parametrs -> PCB Stator Outer Diameter, PCB Stator Inner Diameter, PCB Board Thickness, Trace Width at ID, Trace Gap, Permanent Magnet Rotor Axial Height, Air Gap, Number of PCB Layers, Number of PCB Layers in Series connection, Number of PCB Layers in Parallel. */
